@@ -103,6 +103,65 @@ stdlib+PyYAML, no-infra pattern.
    files; add a slug/title-similarity warning so re-ingesting the same document
    under a new name gets flagged instead of silently forking a second source page.
 
+### Wiki-grade distribution (planned)
+
+**Problem.** The `wiki/` source is genuinely wiki-shaped — every page cross-links
+its neighbours with `[[page-id]]` / `[[page-id|display]]`. But the *published*
+MkDocs site is not: Python-Markdown has no idea what `[[…]]` means, so every
+cross-reference renders as dead literal text (`[[llm-wiki-pattern]]`) instead of
+a clickable link. The homepage graph is the only way to navigate; individual
+pages are leaf documents, not a web. That is the gap between "a folder of
+markdown" and "a wiki."
+
+**Design constraint.** Keep the source canonical. The `[[…]]` syntax stays in
+`wiki/` untouched (so pages still work in Obsidian/Foam and stay diff-friendly);
+all wiki behaviour is *added at build time* from the same manifest + link graph
+the linter already walks. No new runtime, no infra — a generated MkDocs hook and
+richer `viz.py` output, consistent with everything else here.
+
+Ordered by value-for-effort:
+
+1. **Resolve `[[wikilinks]]` → real links (the core fix).** Add a generated
+   MkDocs build hook (`tools/mkdocs_hooks.py`, wired via `hooks:` in the
+   `viz.py`-emitted `mkdocs.yml`). On `on_page_markdown`, rewrite each
+   `[[id]]` / `[[id|display]]` into a relative Markdown link to
+   `../<folder>/<id>.md`, using an id→(folder, title) map built once from the
+   wiki tree. `[[id|display]]` keeps its display text; a bare `[[id]]` renders
+   the page's real title. Reuses `WIKILINK_RE` from `_common.py` verbatim, so
+   the site and `kb lint`'s broken-link check agree by construction. This alone
+   turns the site into a navigable wiki.
+2. **Wanted-links, not dead text.** An `[[id]]` with no target page renders as a
+   distinct "wanted page" span (MediaWiki red-link style) rather than a link or
+   raw brackets — the same set `kb lint --broken_links` already reports, now
+   visible to a reader instead of only to CI.
+3. **Clickable graph.** Make the homepage graph a navigation surface: emit
+   Mermaid `click <node> "<url>"` directives so a 2D node jumps to its page, and
+   give the 3D `onNodeClick` a shift/modifier path (or a "open page" affordance)
+   that navigates to `../<folder>/<id>/`. The graph stops being a picture and
+   becomes a map.
+4. **Titles in the nav.** `build_mkdocs` currently lists pages by `f.stem` (the
+   kebab id). Read each page's frontmatter `title` and use it for the nav label,
+   grouped by type — a wiki's sidebar reads in prose, not slugs.
+5. **"Referenced by" backlinks (supersedes the standalone Backlinks item
+   above).** Append a build-time "Referenced by" block to each page from the
+   inbound-link graph — computed in the same hook, so it needs no marker
+   comments in source and can't drift. This is the file-clean version of item 1
+   in *Next (proposed)*; prefer it for the published site.
+6. **Sources as citations.** Render each page's `sources:` frontmatter as a
+   linked "Sources" section (source id → its `wiki/sources/<id>` page), so the
+   provenance the model already tracks becomes visible, clickable apparatus on
+   the page — the thing that makes a wiki trustworthy rather than just linked.
+7. **Discovery polish (later).** Tag index pages (Material's `tags` plugin) and
+   `aliases:` handled as redirects, so the free-form `tags`/`aliases` frontmatter
+   becomes real browse/lookup surfaces.
+
+**Phasing.** Item 1 is the whole ask ("cross-references should be linked") and
+ships on its own. 2–4 are small, high-visibility follow-ons in the same hook +
+`viz.py` change. 5–6 add the depth (backlinks, citations) that distinguishes a
+wiki from a linked document set. 7 is optional discovery polish. Every step is
+regenerated from the manifest and the existing link graph, and gated by the same
+`mkdocs build --strict` the Publish stage already runs.
+
 ### Shipped
 
 - **`kb search <term>` — ranked grep over frontmatter + body.** ✅ Shipped.
