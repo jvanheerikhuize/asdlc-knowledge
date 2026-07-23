@@ -202,6 +202,10 @@ extra_javascript:
   - https://cdn.jsdelivr.net/npm/3d-force-graph@1
 plugins:
   - search
+# Resolve [[wikilinks]] -> real links at build time (tools/mkdocs_hooks.py).
+# Keeps wiki/ source canonical while the published site behaves like a wiki.
+hooks:
+  - tools/mkdocs_hooks.py
 nav:
 {chr(10).join(nav)}
 """
