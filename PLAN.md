@@ -81,3 +81,14 @@ All six operations run clean on the seed content: `scaffold`, `ingest`, `index`,
 `lint` (0 issues), `verify`, `viz`. Three seed pages (`karpathy-llm-wiki`,
 `andrej-karpathy`, `llm-wiki-pattern`) are cross-linked and sourced to the
 ingested raw gist.
+
+## 6. Roadmap
+
+- **`kb purge` — easily purge the contents.** A single command to empty the
+  knowledge base back to a clean, scaffolded state: clear `raw/` and the
+  `wiki/` page folders, reset the generated views (`index.md` marker blocks,
+  `wiki/_graph.md`, `mkdocs.yml`), and leave `manifest.yaml`, `AGENTS.md`, and
+  `tools/` untouched. Guard it behind a `--yes` confirmation (dry-run by
+  default, printing what would be removed) so a purge is never accidental, and
+  add `--raw`/`--wiki` scopes to purge one layer without the other. Follows the
+  same manifest-driven, no-infra pattern as the existing operations.
