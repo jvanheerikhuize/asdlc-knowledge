@@ -25,8 +25,16 @@ the manifest wins.
 
 ## 2. The operations (your job)
 
-Everything you do is one of six verbs. Each has a CLI entry (`tools/kb.py`)
+Everything you do is one of seven verbs. Each has a CLI entry (`tools/kb.py`)
 that handles the deterministic bookkeeping; you provide the judgement.
+
+### `new` — start a page by hand (not via ingest)
+`kb new <type> <id> [--title "..."]` stamps `_templates/<type>.md` into
+`wiki/<folder>/<id>.md` with `id`, `type`, today's `created`/`updated`, and
+`status: draft` filled in. Use it for entity/concept pages you're writing from
+your own synthesis rather than a fresh ingested source. Fill in the body,
+`sources:`, and `[[wikilinks]]` yourself — `kb lint` will flag the page as an
+orphan/unsourced draft until you do.
 
 ### `ingest` — a new source arrived
 1. A file lands in `inbox/` (drop-zone) or `raw/`. Run `kb ingest` with no args

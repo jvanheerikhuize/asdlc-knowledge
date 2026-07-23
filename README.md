@@ -41,6 +41,7 @@ pip install -e ".[all]"          # or just: pip install pyyaml
 cd .asdlc/knowledge
 
 python3 tools/kb.py scaffold      # regenerate schema + templates from manifest
+python3 tools/kb.py new <type> <id> [--title "..."]  # stamp a new page from its template
 python3 tools/kb.py ingest        # drop file(s) in inbox/, then batch-ingest them all
 python3 tools/kb.py ingest <file> # or convert one explicit binary/text source
 python3 tools/kb.py index         # rebuild index.md from frontmatter
@@ -53,6 +54,7 @@ mkdocs build                      # render the static visualization site
 ## The `kb` operations
 
 - **scaffold** — regenerate `_schema/` and `_templates/` from `manifest.yaml`. Run in CI on manifest change.
+- **new** — stamp a page from `_templates/<type>.md` with `id`, today's dates, and `status: draft` pre-filled.
 - **ingest** — with no args, batch-ingest everything dropped in `inbox/` (copy into `raw/`, convert, scaffold a `source` page, clear the inbox); with a path, ingest that one file. Auto-uses a local `.venv` for the optional adapters, so a single command "just works".
 - **index** — rebuild the catalog blocks in `index.md`.
 - **lint** — schema, broken-link, orphan, unsourced, confidence-cap, and staleness checks.
