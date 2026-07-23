@@ -16,4 +16,4 @@ category: # Optional grouping tag.   # optional
 
 > An abstract idea, pattern, method, or definition.
 
-<!-- Body: human-readable prose. Link with [[page-id]]. Cite sources inline. -->
+<!-- Body: human-readable prose. Link related pages by wrapping their id in double brackets. Cite sources inline. -->

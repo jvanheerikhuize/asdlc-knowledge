@@ -19,4 +19,4 @@ checksum: # sha256 of the raw artifact.   # optional
 
 > One page per ingested raw document. The bridge from raw/ to wiki/.
 
-<!-- Body: human-readable prose. Link with [[page-id]]. Cite sources inline. -->
+<!-- Body: human-readable prose. Link related pages by wrapping their id in double brackets. Cite sources inline. -->

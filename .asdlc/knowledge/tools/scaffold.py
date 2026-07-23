@@ -78,8 +78,8 @@ def build_template(tname: str, tspec: dict, m: dict) -> str:
     lines.append("---")
     lines.append(f"\n# {{{{title}}}}\n")
     lines.append(f"> {tspec['purpose']}\n")
-    lines.append("<!-- Body: human-readable prose. Link with [[page-id]]. "
-                 "Cite sources inline. -->\n")
+    lines.append("<!-- Body: human-readable prose. Link related pages by "
+                 "wrapping their id in double brackets. Cite sources inline. -->\n")
     return "\n".join(lines)
 
 
