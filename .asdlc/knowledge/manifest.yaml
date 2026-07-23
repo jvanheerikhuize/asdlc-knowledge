@@ -1,0 +1,117 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# manifest.yaml — THE SINGLE SOURCE OF TRUTH for this knowledge base.
+#
+# Everything downstream is generated from this file:
+#   - directory layout                 (tools/scaffold.py)
+#   - JSON Schema for page frontmatter  (_schema/frontmatter.schema.json)
+#   - page templates                    (_templates/*.md)
+#   - lint thresholds & policies        (tools/lint.py)
+#   - the viz site config               (tools/viz.py -> mkdocs.yml)
+#
+# Edit this file, then run `python tools/kb.py scaffold` (or trigger the
+# "scaffold" GitHub Action). Never hand-edit generated artifacts.
+# ─────────────────────────────────────────────────────────────────────────────
+
+version: 1
+
+name: "ASDLC Knowledge Base"
+description: >
+  A persistent, file-based, agent-agnostic knowledge base built on the
+  "LLM wiki" pattern: raw sources are ingested once, compiled into an
+  interlinked markdown wiki, and kept honest with confidence scoring and
+  fact-checking.
+
+# Paths are relative to this manifest's directory (.asdlc/knowledge).
+paths:
+  raw: raw            # immutable source-of-truth documents (incl. binaries)
+  wiki: wiki          # LLM-maintained, human-readable markdown pages
+  schema: _schema     # generated JSON Schema + validation assets
+  templates: _templates
+  index: index.md     # catalog / table of contents
+  log: log.md         # append-only activity log
+
+# ── Page types ───────────────────────────────────────────────────────────────
+# Each type becomes a subfolder under wiki/, a template, and a branch of the
+# JSON Schema. `fields` extend the shared base frontmatter (see base_fields).
+page_types:
+  source:
+    folder: sources
+    title: "Source"
+    purpose: "One page per ingested raw document. The bridge from raw/ to wiki/."
+    fields:
+      origin: { type: string, required: true, desc: "Path under raw/ or a URL." }
+      media_type: { type: string, required: true, desc: "pdf|docx|html|audio|image|text" }
+      ingested_with: { type: string, required: false, desc: "Ingestion adapter used." }
+      checksum: { type: string, required: false, desc: "sha256 of the raw artifact." }
+  entity:
+    folder: entities
+    title: "Entity"
+    purpose: "A concrete thing: person, org, system, product, dataset."
+    fields:
+      entity_type: { type: string, required: true, desc: "person|org|system|product|dataset" }
+      aliases: { type: array, required: false, desc: "Other names this entity is known by." }
+  concept:
+    folder: concepts
+    title: "Concept"
+    purpose: "An abstract idea, pattern, method, or definition."
+    fields:
+      category: { type: string, required: false, desc: "Optional grouping tag." }
+
+# ── Base frontmatter shared by EVERY page ─────────────────────────────────────
+# This is where fact-checking & confidence scoring are encoded structurally.
+base_fields:
+  id: { type: string, required: true, desc: "Stable kebab-case slug; also the filename." }
+  title: { type: string, required: true, desc: "Human-readable page title." }
+  type: { type: string, required: true, desc: "One of page_types (source|entity|concept)." }
+  status:
+    type: string
+    required: true
+    enum: [draft, verified, stale, disputed]
+    desc: "Editorial state. `verified` requires a passing fact-check."
+  confidence:
+    type: number
+    required: true
+    min: 0.0
+    max: 1.0
+    desc: "Aggregate confidence 0-1. See confidence_policy below."
+  sources:
+    type: array
+    required: true
+    desc: "IDs of source pages backing this page. Empty => unsupported => capped confidence."
+  created: { type: string, required: true, desc: "ISO date the page was created." }
+  updated: { type: string, required: true, desc: "ISO date of last content change." }
+  last_verified: { type: string, required: false, desc: "ISO date fact-check last passed." }
+  tags: { type: array, required: false, desc: "Free-form topical tags." }
+
+# ── Fact-checking & confidence policy ─────────────────────────────────────────
+# Deterministic parts are enforced by tools/lint.py; claim-level verification
+# is an agent operation (see AGENTS.md -> `verify`).
+confidence_policy:
+  unsourced_confidence_cap: 0.3   # a page with zero sources cannot exceed this
+  verified_max_age_days: 180      # `status: verified` requires recent verification
+  stale_after_days: 365           # unverified + untouched longer than this => stale
+  bands:
+    - { label: high,   min: 0.75, color: "#2f9e44" }
+    - { label: medium, min: 0.45, color: "#f08c00" }
+    - { label: low,    min: 0.0,  color: "#e03131" }
+
+# ── Lint checks toggles ───────────────────────────────────────────────────────
+lint:
+  frontmatter_schema: true   # validate every page against the generated schema
+  orphan_pages: true         # wiki pages with no inbound [[wikilinks]]
+  broken_links: true         # [[wikilinks]] that point nowhere
+  unsourced_claims: true     # non-source pages with empty `sources`
+  stale_pages: true          # per confidence_policy.stale_after_days
+  confidence_cap: true       # confidence exceeds policy caps
+
+# ── Ingestion layer ───────────────────────────────────────────────────────────
+# Adapters implement the interface in ingest/adapters/base.py. First adapter
+# whose accepts() matches the media type wins; order = priority.
+ingest:
+  adapters: [plaintext, markitdown, docling]
+  default: markitdown
+
+# ── Visualization layer ───────────────────────────────────────────────────────
+viz:
+  engine: mkdocs-material   # static site, no server/infra needed to build
+  features: [graph, confidence-badges, search]

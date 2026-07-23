@@ -1,0 +1,29 @@
+name: scaffold
+
+# Regenerate schema + templates from the single source of truth (manifest.yaml)
+# and fail if the committed artifacts have drifted. Also runnable on demand.
+on:
+  push:
+    paths:
+      - ".asdlc/knowledge/manifest.yaml"
+      - ".asdlc/knowledge/tools/scaffold.py"
+  workflow_dispatch:
+
+jobs:
+  scaffold:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install pyyaml
+      - name: Regenerate from manifest
+        working-directory: .asdlc/knowledge
+        run: python3 tools/kb.py scaffold
+      - name: Fail if generated artifacts drifted
+        run: |
+          if ! git diff --exit-code -- .asdlc/knowledge/_schema .asdlc/knowledge/_templates; then
+            echo "::error::Generated schema/templates are out of date. Run 'kb scaffold' and commit."
+            exit 1
+          fi
