@@ -31,6 +31,6 @@ tags: [pattern, rag-alternative]
 
 ## Why it works
 The bottleneck in knowledge bases is *bookkeeping*, not thinking — precisely the
-maintenance work an agent can do tirelessly. This KB extends the pattern with an
-explicit confidence/fact-check policy and a binary ingestion layer so the wiki
-stays both broad and trustworthy.
+maintenance work an agent can do tirelessly. [[asdlc-knowledge-base|This KB]]
+extends the pattern with an explicit confidence/fact-check policy and a binary
+ingestion layer so the wiki stays both broad and trustworthy.

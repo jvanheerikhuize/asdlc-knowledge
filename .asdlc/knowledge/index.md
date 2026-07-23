@@ -11,6 +11,7 @@ generated_by: tools/scaffold.py
 
 ## Sources
 <!-- kb:sources:start -->
+- [[asdlc-knowledge-readme]] — The project README for [[asdlc-knowledge-base]]: a persistent, file-ba · **high**
 - [[karpathy-llm-wiki]] — The originating source for this knowledge base's design. Defines the · **high**
 - [[rag-lewis-2020]] — The paper that named and formalised [[retrieval-augmented-generation]] · **high**
 <!-- kb:sources:end -->
@@ -18,6 +19,7 @@ generated_by: tools/scaffold.py
 ## Entities
 <!-- kb:entities:start -->
 - [[andrej-karpathy]] — Researcher and educator; author of the gist that originated the · **high**
+- [[asdlc-knowledge-base]] — This repository: a persistent, file-based knowledge base for AI-assist · **high**
 - [[patrick-lewis]] — Lead author of [[rag-lewis-2020]], the paper that named and formalised · **medium**
 <!-- kb:entities:end -->
 

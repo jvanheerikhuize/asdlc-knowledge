@@ -21,10 +21,12 @@ plugins:
 nav:
   - Overview: index.md
   - Sources:
+      - asdlc-knowledge-readme: sources/asdlc-knowledge-readme.md
       - karpathy-llm-wiki: sources/karpathy-llm-wiki.md
       - rag-lewis-2020: sources/rag-lewis-2020.md
   - Entities:
       - andrej-karpathy: entities/andrej-karpathy.md
+      - asdlc-knowledge-base: entities/asdlc-knowledge-base.md
       - patrick-lewis: entities/patrick-lewis.md
   - Concepts:
       - llm-wiki-pattern: concepts/llm-wiki-pattern.md
