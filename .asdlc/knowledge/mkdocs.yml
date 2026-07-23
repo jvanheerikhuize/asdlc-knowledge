@@ -23,6 +23,7 @@ nav:
   - Sources:
       - asdlc-knowledge-readme: sources/asdlc-knowledge-readme.md
       - karpathy-llm-wiki: sources/karpathy-llm-wiki.md
+      - llm-wiki-setup-guide-2026: sources/llm-wiki-setup-guide-2026.md
       - rag-lewis-2020: sources/rag-lewis-2020.md
   - Entities:
       - andrej-karpathy: entities/andrej-karpathy.md
