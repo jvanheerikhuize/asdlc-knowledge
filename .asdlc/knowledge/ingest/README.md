@@ -21,9 +21,27 @@ class IngestAdapter(Protocol):
 
 ## Dispatch
 
-`tools/ingest.py` walks the adapters listed in `manifest.yaml -> ingest.adapters`
+`tools/ingest_cmd.py` walks the adapters listed in `manifest.yaml -> ingest.adapters`
 in priority order and picks the first whose `accepts()` returns True. Order and
 default are configuration, not code.
+
+## The drop-zone workflow
+
+The end-user path is the `inbox/` folder. Drop any file(s) into it and run:
+
+```bash
+python3 tools/kb.py ingest        # no args = batch-ingest the whole inbox
+```
+
+Each file is copied into `raw/` (immutable), converted by the first accepting
+adapter, scaffolded into a draft page under `wiki/sources/`, and then cleared out
+of the inbox. Re-running is safe — files whose source page already exists are
+skipped, and failures stay in the inbox for a retry. If the optional backends are
+installed only in a local `.venv`, that virtualenv is discovered automatically so
+the single command works without activating anything.
+
+`python3 tools/kb.py ingest <path>` still ingests one explicit file (under `raw/`
+or an absolute path) for scripted/one-off use.
 
 ## Shipped adapters
 

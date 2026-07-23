@@ -23,6 +23,7 @@ description: >
 
 # Paths are relative to this manifest's directory (.asdlc/knowledge).
 paths:
+  inbox: inbox        # drop-zone: files land here, `kb ingest` empties it into raw/
   raw: raw            # immutable source-of-truth documents (incl. binaries)
   wiki: wiki          # LLM-maintained, human-readable markdown pages
   schema: _schema     # generated JSON Schema + validation assets

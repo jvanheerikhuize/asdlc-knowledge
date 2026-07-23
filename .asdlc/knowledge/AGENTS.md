@@ -29,10 +29,12 @@ Everything you do is one of five verbs. Each has a CLI entry (`tools/kb.py`)
 that handles the deterministic bookkeeping; you provide the judgement.
 
 ### `ingest` — a new source arrived
-1. A binary/document lands in `raw/`. Run `kb ingest <path>` (or call the
-   ingestion layer, §4) to convert it to markdown text.
-2. Create/refresh one **source page** under `wiki/sources/` (use the template).
-   Record `origin`, `media_type`, `ingested_with`, `checksum`.
+1. A file lands in `inbox/` (drop-zone) or `raw/`. Run `kb ingest` with no args
+   to batch-ingest the whole inbox — each file is copied into `raw/`, converted,
+   and given a draft source page — or `kb ingest <path>` for one explicit file.
+2. Steps 1's scaffolding writes one **source page** per file under `wiki/sources/`
+   (`origin`, `media_type`, `ingested_with`, `checksum` are filled in for you).
+   The pages land as `status: draft` — the steps below turn them into real wiki.
 3. Read the extracted text. Update **entity** and **concept** pages it touches
    (typically 10–15 pages). Add `[[wikilinks]]` both ways.
 4. For every claim you write on an entity/concept page, add the source page's

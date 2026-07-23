@@ -2,7 +2,8 @@
 """kb — the single CLI to interact with the knowledge base.
 
     kb scaffold          regenerate structure from manifest.yaml
-    kb ingest <path>     convert a raw file and scaffold a source page
+    kb ingest            batch-ingest every file dropped in inbox/
+    kb ingest <path>     convert one raw file and scaffold a source page
     kb lint [--strict]   run deterministic health checks
     kb verify <page-id>  assemble a page + its sources for fact-checking
     kb viz               regenerate mkdocs.yml + the Mermaid graph
@@ -72,12 +73,13 @@ def main(argv: list[str]) -> int:
     if cmd == "ingest":
         import ingest_cmd as ingest
         ns = {"path": None, "adapter": None}
-        if not rest:
-            print("usage: kb ingest <path> [--adapter NAME]", file=sys.stderr)
-            return 2
-        ns["path"] = rest[0]
         if "--adapter" in rest:
-            ns["adapter"] = rest[rest.index("--adapter") + 1]
+            i = rest.index("--adapter")
+            ns["adapter"] = rest[i + 1]
+            rest = rest[:i] + rest[i + 2:]
+        if rest:                       # explicit path => single-file mode
+            ns["path"] = rest[0]
+        # no path => batch mode: ingest everything in inbox/
         return ingest.run(**ns)
     if cmd == "purge":
         import purge

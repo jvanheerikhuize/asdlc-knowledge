@@ -26,6 +26,7 @@ sourced, and trustworthy over time.
 | `.asdlc/knowledge/AGENTS.md` | **Single entry point** for any agent — vendor-neutral contract of how to read/write the KB. |
 | `.asdlc/knowledge/index.md` | Human/agent catalog, auto-rebuilt from page frontmatter. |
 | `.asdlc/knowledge/log.md` | Append-only change log. |
+| `.asdlc/knowledge/inbox/` | Drop-zone for new files. `kb ingest` (no args) empties it into `raw/`. |
 | `.asdlc/knowledge/raw/` | Immutable ingested source artifacts. Never edited. |
 | `.asdlc/knowledge/wiki/` | The LLM-maintained wiki: `sources/`, `entities/`, `concepts/`. |
 | `.asdlc/knowledge/_schema/` | JSON Schema generated from the manifest. |
@@ -40,7 +41,8 @@ pip install -e ".[all]"          # or just: pip install pyyaml
 cd .asdlc/knowledge
 
 python3 tools/kb.py scaffold      # regenerate schema + templates from manifest
-python3 tools/kb.py ingest <file> # convert a binary/text source -> a source page
+python3 tools/kb.py ingest        # drop file(s) in inbox/, then batch-ingest them all
+python3 tools/kb.py ingest <file> # or convert one explicit binary/text source
 python3 tools/kb.py index         # rebuild index.md from frontmatter
 python3 tools/kb.py lint          # deterministic health checks
 python3 tools/kb.py verify <id>   # assemble a page + sources for fact-checking
@@ -51,7 +53,7 @@ mkdocs build                      # render the static visualization site
 ## The `kb` operations
 
 - **scaffold** — regenerate `_schema/` and `_templates/` from `manifest.yaml`. Run in CI on manifest change.
-- **ingest** — dispatch a raw file to the first accepting adapter, write a `source` page.
+- **ingest** — with no args, batch-ingest everything dropped in `inbox/` (copy into `raw/`, convert, scaffold a `source` page, clear the inbox); with a path, ingest that one file. Auto-uses a local `.venv` for the optional adapters, so a single command "just works".
 - **index** — rebuild the catalog blocks in `index.md`.
 - **lint** — schema, broken-link, orphan, unsourced, confidence-cap, and staleness checks.
 - **verify** — assemble a page with its cited sources so an agent can fact-check it.

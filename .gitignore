@@ -18,3 +18,9 @@ site/
 
 # Local agent/editor state
 .claude/
+
+# Ingestion drop-zone: files staged for ingest are not committed until they
+# have been converted and moved into raw/. Keep the folder itself tracked.
+.asdlc/knowledge/inbox/*
+!.asdlc/knowledge/inbox/README.md
+!.asdlc/knowledge/inbox/.gitkeep
