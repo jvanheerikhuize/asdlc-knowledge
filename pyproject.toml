@@ -26,9 +26,8 @@ all = [
     "pymdown-extensions>=10.0",
 ]
 
-[project.scripts]
-kb = "kb:main"
-
 [tool.setuptools]
-# The KB is a data-first project; the tools live under .asdlc/knowledge/tools.
+# The KB is a data-first project; the tools live under .asdlc/knowledge/tools
+# and are invoked as `python3 tools/kb.py <op>` — no console script is
+# installed, since no importable package ships with this distribution.
 py-modules = []

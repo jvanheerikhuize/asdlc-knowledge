@@ -25,7 +25,7 @@ the manifest wins.
 
 ## 2. The operations (your job)
 
-Everything you do is one of five verbs. Each has a CLI entry (`tools/kb.py`)
+Everything you do is one of six verbs. Each has a CLI entry (`tools/kb.py`)
 that handles the deterministic bookkeeping; you provide the judgement.
 
 ### `ingest` — a new source arrived
