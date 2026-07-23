@@ -89,28 +89,35 @@ ingested raw gist.
 Ordered by value-for-effort; each follows the existing manifest-driven,
 stdlib+PyYAML, no-infra pattern.
 
-1. **`kb new <type> <id>`** — stamp a page from `_templates/<type>.md` with
-   `id`, today's `created`/`updated`, and `status: draft` pre-filled. Removes
-   the last bit of manual bookkeeping when writing entity/concept pages by hand.
-2. **Backlinks** — `kb index` (or a new `kb backlinks`) appends a generated
+1. **Backlinks** — `kb index` (or a new `kb backlinks`) appends a generated
    "Referenced by" block to each page (marker comments, like `index.md`).
    Makes the graph navigable from any page, not just the homepage.
-3. **`kb search <term>`** — ranked grep over frontmatter + body that prints
+2. **`kb search <term>`** — ranked grep over frontmatter + body that prints
    page ids with matching excerpts. The missing CLI half of the `query` verb in
    `AGENTS.md` (today an agent ad-hoc greps).
-4. **`kb verify --all` + scheduled staleness sweep** — iterate verify output
+3. **`kb verify --all` + scheduled staleness sweep** — iterate verify output
    over every page, and add a weekly `schedule:` trigger to `validate.yml` so
    `verified_max_age_days`/`stale_after_days` actually fire over time, not only
    when someone happens to push.
-5. **URL ingestion** — let `kb ingest <url>` fetch and snapshot a web page into
+4. **URL ingestion** — let `kb ingest <url>` fetch and snapshot a web page into
    `raw/` (markitdown already converts HTML). Most new knowledge arrives as
    links, not files.
-6. **Near-duplicate warning on ingest** — checksums already catch identical
+5. **Near-duplicate warning on ingest** — checksums already catch identical
    files; add a slug/title-similarity warning so re-ingesting the same document
    under a new name gets flagged instead of silently forking a second source page.
 
 ### Shipped
 
+- **`kb new <type> <id>` — stamp a page from its template.** ✅ Shipped. Fills
+  in `id`, `title`, today's `created`/`updated`, and `status: draft` from
+  `_templates/<type>.md`, writing straight into `wiki/<folder>/<id>.md`.
+  Removes the manual bookkeeping when starting an entity/concept page by hand
+  (as opposed to `kb ingest`, which stamps a source page from a file). Also
+  fixed two latent bugs the first real use of the templates surfaced: optional
+  blank fields (`key: # comment`) were serializing as YAML `null`, which
+  failed the generated schema's `type: string` checks; and the template's
+  instructional `[[page-id]]` example was itself a wikilink, tripping the
+  broken-link linter on every stamped page.
 - **`kb purge` — easily purge the contents.** ✅ Shipped. A single command
   empties the knowledge base back to a clean, scaffolded state: it clears `raw/`
   and the `wiki/` page folders, resets the generated views (`index.md` marker

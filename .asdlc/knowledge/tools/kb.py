@@ -2,6 +2,7 @@
 """kb — the single CLI to interact with the knowledge base.
 
     kb scaffold          regenerate structure from manifest.yaml
+    kb new <type> <id>   stamp a page from _templates/<type>.md (--title "...")
     kb ingest            batch-ingest every file dropped in inbox/
     kb ingest <path>     convert one raw file and scaffold a source page
     kb lint [--strict]   run deterministic health checks
@@ -62,6 +63,18 @@ def main(argv: list[str]) -> int:
     if cmd == "scaffold":
         import scaffold
         return scaffold.main()
+    if cmd == "new":
+        import new
+        if len(rest) < 2:
+            print("usage: kb new <type> <id> [--title \"...\"]", file=sys.stderr)
+            return 2
+        type_, id_ = rest[0], rest[1]
+        rest = rest[2:]
+        title = None
+        if "--title" in rest:
+            i = rest.index("--title")
+            title = rest[i + 1]
+        return new.run(type_, id_, title=title)
     if cmd == "lint":
         import lint
         return lint.run(strict="--strict" in rest)

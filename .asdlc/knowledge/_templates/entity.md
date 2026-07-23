@@ -17,4 +17,4 @@ aliases: []   # optional
 
 > A concrete thing: person, org, system, product, dataset.
 
-<!-- Body: human-readable prose. Link with [[page-id]]. Cite sources inline. -->
+<!-- Body: human-readable prose. Link related pages by wrapping their id in double brackets. Cite sources inline. -->
