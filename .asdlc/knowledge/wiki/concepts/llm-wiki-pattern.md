@@ -15,7 +15,8 @@ tags: [pattern, rag-alternative]
 # LLM Wiki Pattern
 
 > Compile knowledge once into a persistent, interlinked markdown wiki and keep
-> it current — instead of re-deriving it on every query as RAG does.
+> it current — instead of re-deriving it on every query as
+> [[retrieval-augmented-generation]] does.
 > Introduced in [[karpathy-llm-wiki]] by [[andrej-karpathy]].
 
 ## Layers
@@ -31,5 +32,5 @@ tags: [pattern, rag-alternative]
 ## Why it works
 The bottleneck in knowledge bases is *bookkeeping*, not thinking — precisely the
 maintenance work an agent can do tirelessly. This KB extends the pattern with an
-[[llm-wiki-pattern|explicit]] confidence/fact-check policy and a binary
-ingestion layer so the wiki stays both broad and trustworthy.
+explicit confidence/fact-check policy and a binary ingestion layer so the wiki
+stays both broad and trustworthy.

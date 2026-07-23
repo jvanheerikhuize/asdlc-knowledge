@@ -22,7 +22,10 @@ nav:
   - Overview: index.md
   - Sources:
       - karpathy-llm-wiki: sources/karpathy-llm-wiki.md
+      - rag-lewis-2020: sources/rag-lewis-2020.md
   - Entities:
       - andrej-karpathy: entities/andrej-karpathy.md
+      - patrick-lewis: entities/patrick-lewis.md
   - Concepts:
       - llm-wiki-pattern: concepts/llm-wiki-pattern.md
+      - retrieval-augmented-generation: concepts/retrieval-augmented-generation.md
