@@ -1,8 +1,10 @@
 name: validate
 
-# Deterministic health check on every push/PR.
+# Deterministic health check on every PR and on main.
+# (push is scoped to main so PR branches don't run the same lint twice.)
 on:
   push:
+    branches: [main]
   pull_request:
   workflow_dispatch:
 
