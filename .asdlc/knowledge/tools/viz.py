@@ -25,94 +25,72 @@ TYPE_SHAPE = {
     "entity": ("([", "])"),
     "source": ("[/", "/]"),
 }
-TYPE_ORDER = ["concept", "entity", "source"]  # abstract idea -> who -> evidence
-TYPE_TITLE = {"concept": "Concepts", "entity": "Entities", "source": "Sources"}
+TYPE_LABEL = {"concept": "concept", "entity": "entity", "source": "source"}
 
 
 def _safe(node_id: str) -> str:
     return node_id.replace("-", "_")
 
 
-def _node(p, m: dict, band_color: dict) -> tuple[str, str]:
-    """Return (declaration, style) lines for one page node."""
-    conf = float(p.frontmatter.get("confidence", 0.0) or 0.0)
-    band = confidence_band(conf, m)
-    title = str(p.frontmatter.get("title", p.id)).replace('"', "'")
-    pre, suf = TYPE_SHAPE.get(p.type, ("[", "]"))
-    sid = _safe(p.id)
-    decl = f'    {sid}{pre}"{title}<br/><small>{conf} · {band}</small>"{suf}'
-    style = (f'  style {sid} fill:{band_color[band]}18,'
-             f'stroke:{band_color[band]},stroke-width:1px')
-    return decl, style
-
-
-def build_graph(m: dict) -> str:
-    pages = list(iter_pages(m))
-    band_color = {b["label"]: b["color"] for b in m["confidence_policy"]["bands"]}
-    by_id = {p.id: p for p in pages}
-    ids = set(by_id)
-
-    lines = ["```mermaid", "graph LR"]
-
-    # 1) Nodes, grouped into one subgraph per layer so the wiki's structure
-    #    (concepts synthesised from entities and sources) reads at a glance.
-    styles: list[str] = []
-    for ptype in TYPE_ORDER:
-        group = [p for p in pages if p.type == ptype]
-        if not group:
-            continue
-        lines.append(f'  subgraph {ptype}_layer["{TYPE_TITLE[ptype]}"]')
-        lines.append("    direction LR")
-        for p in group:
-            decl, style = _node(p, m, band_color)
-            lines.append(decl)
-            styles.append(style)
-        lines.append("  end")
-    # Any page type not in TYPE_ORDER still gets drawn (ungrouped).
-    for p in pages:
-        if p.type not in TYPE_ORDER:
-            decl, style = _node(p, m, band_color)
-            lines.append("  " + decl.strip())
-            styles.append(style)
-
-    # 2) Edges. Collapse reciprocal wikilinks into a single line, and draw
-    #    citations (a page pointing at a source) dotted to set them apart from
-    #    solid concept<->entity "relates-to" links.
-    pair_dirs: dict[tuple[str, str], set[str]] = {}
+def _neighbours(pages, ids) -> dict[str, set[str]]:
+    """Undirected connectivity: for each page, the set of distinct other pages
+    it links to or is linked from. This is the `count` shown on each node, so
+    we never have to draw the individual link lines."""
+    nb: dict[str, set[str]] = {p.id: set() for p in pages}
     for p in pages:
         for tgt in p.links():
             if tgt in ids and tgt != p.id:
-                key = tuple(sorted((p.id, tgt)))
-                pair_dirs.setdefault(key, set()).add(p.id)
+                nb[p.id].add(tgt)
+                nb[tgt].add(p.id)
+    return nb
 
-    for (a, b), origins in sorted(pair_dirs.items()):
-        both = len(origins) == 2
-        is_cite = "source" in (by_id[a].type, by_id[b].type)
-        # Orient a single-direction arrow from the actual source of the link.
-        src, dst = (a, b) if a in origins else (b, a)
-        if is_cite:
-            arrow = "<-.->" if both else "-.->"
-        else:
-            arrow = "<-->" if both else "-->"
-        lines.append(f'  {_safe(src)} {arrow} {_safe(dst)}')
 
+def build_graph(m: dict) -> str:
+    """A line-free overview: one node per page, labelled with its connection
+    count and coloured by confidence. Relationships live in the table below —
+    the graph deliberately draws no edges so it never turns into a hairball."""
+    pages = list(iter_pages(m))
+    band_color = {b["label"]: b["color"] for b in m["confidence_policy"]["bands"]}
+    ids = {p.id for p in pages}
+    nb = _neighbours(pages, ids)
+
+    lines = ["```mermaid", "graph LR"]
+    styles: list[str] = []
+    for p in sorted(pages, key=lambda p: (-len(nb[p.id]), p.id)):
+        conf = float(p.frontmatter.get("confidence", 0.0) or 0.0)
+        band = confidence_band(conf, m)
+        title = str(p.frontmatter.get("title", p.id)).replace('"', "'")
+        ptype = TYPE_LABEL.get(p.type, p.type or "page")
+        pre, suf = TYPE_SHAPE.get(p.type, ("[", "]"))
+        sid = _safe(p.id)
+        count = len(nb[p.id])
+        label = (f'{title}<br/><small>{ptype} · {conf} {band}</small>'
+                 f'<br/><b>{count}🔗</b>')
+        lines.append(f'  {sid}{pre}"{label}"{suf}')
+        styles.append(f'  style {sid} fill:{band_color[band]}22,'
+                      f'stroke:{band_color[band]},stroke-width:2px,color:#212529')
     lines.extend(styles)
-
-    # 3) Legend: one example of each shape + a note on what colour/line mean.
-    lines.append('  subgraph legend["Legend"]')
-    lines.append("    direction LR")
-    lines.append('    lg_c("Concept")')
-    lines.append('    lg_e(["Entity"])')
-    lines.append('    lg_s[/"Source"/]')
-    lines.append('    lg_c -.->|cites| lg_s')
-    lines.append('    lg_c <--> lg_e')
-    lines.append("  end")
-    lines.append("  style legend fill:none,stroke:#adb5bd,stroke-dasharray:3 3")
-    for lg in ("lg_c", "lg_e", "lg_s"):
-        lines.append(f"  style {lg} fill:#f1f3f5,stroke:#adb5bd")
-
     lines.append("```")
     return "\n".join(lines)
+
+
+def build_table(m: dict) -> str:
+    """Line-free relationship view: each page and what it links to, so the
+    connections are legible without any edges drawn on the graph."""
+    pages = list(iter_pages(m))
+    ids = {p.id for p in pages}
+    nb = _neighbours(pages, ids)
+    rows = ["| Page | Type | Confidence | 🔗 | Connects to |",
+            "| --- | --- | --- | --- | --- |"]
+    for p in sorted(pages, key=lambda p: (-len(nb[p.id]), p.id)):
+        conf = float(p.frontmatter.get("confidence", 0.0) or 0.0)
+        band = confidence_band(conf, m)
+        title = str(p.frontmatter.get("title", p.id))
+        ptype = TYPE_LABEL.get(p.type, p.type or "page")
+        links = ", ".join(f"`{t}`" for t in sorted(nb[p.id])) or "—"
+        rows.append(f"| **{title}** | {ptype} | {conf} {band} | "
+                    f"{len(nb[p.id])} | {links} |")
+    return "\n".join(rows)
 
 
 def build_mkdocs(m: dict) -> str:
@@ -159,17 +137,20 @@ def main() -> int:
     home_path = KB_ROOT / m["paths"]["wiki"] / "index.md"
     intro = (
         "---\ntitle: Knowledge Graph\n---\n\n# Knowledge Graph\n\n"
-        "Every page in the wiki and how it links to the others. Read it as:\n\n"
-        "- **Shape = layer** — `(concept)` rounded, `([entity])` stadium, "
-        "`[/source/]` document. Pages are grouped into their layer.\n"
+        "Every page in the wiki at a glance — no tangle of link lines. "
+        "Each card reads as:\n\n"
+        "- **Shape = type** — `(concept)` rounded, `([entity])` stadium, "
+        "`[/source/]` document.\n"
         "- **Colour = confidence** — green `high` (≥0.75), orange `medium` "
-        "(≥0.45), red `low`. The `0.0 · band` under each title is the score.\n"
-        "- **Line = relationship** — solid `↔` is a concept/entity cross-link; "
-        "dotted `⋯▸` is a **citation** to a source. Double-headed means both "
-        "pages link back to each other.\n\n"
+        "(≥0.45), red `low`; the score sits under the title.\n"
+        "- **`N🔗` = connections** — how many other pages this one is linked "
+        "to. Cards are ordered by that count, so the hubs come first.\n\n"
+        "The exact **who-links-to-whom** is in the table below the graph, "
+        "so the relationships stay readable without drawing every edge.\n\n"
         "Regenerate after any content change with `python tools/kb.py viz`.\n\n"
     )
-    home_path.write_text(intro + build_graph(m) + "\n")
+    body = build_graph(m) + "\n\n## Connections\n\n" + build_table(m) + "\n"
+    home_path.write_text(intro + body)
     print(f"generated {home_path.relative_to(KB_ROOT)}")
     mk = KB_ROOT / "mkdocs.yml"
     mk.write_text(build_mkdocs(m))
