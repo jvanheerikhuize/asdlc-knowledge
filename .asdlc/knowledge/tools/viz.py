@@ -17,25 +17,12 @@ from pathlib import Path
 from _common import KB_ROOT, confidence_band, iter_pages, load_manifest
 
 
-# How each page type is drawn. `shape` is a (prefix, suffix) pair wrapping the
-# node label so the type is legible from the silhouette alone: concepts are
-# rounded, entities are stadiums, sources are document/parallelograms.
-TYPE_SHAPE = {
-    "concept": ("(", ")"),
-    "entity": ("([", "])"),
-    "source": ("[/", "/]"),
-}
 TYPE_LABEL = {"concept": "concept", "entity": "entity", "source": "source"}
-
-
-def _safe(node_id: str) -> str:
-    return node_id.replace("-", "_")
 
 
 def _neighbours(pages, ids) -> dict[str, set[str]]:
     """Undirected connectivity: for each page, the set of distinct other pages
-    it links to or is linked from. This is the `count` shown on each node, so
-    we never have to draw the individual link lines."""
+    it links to or is linked from. Used to build the Connections table."""
     nb: dict[str, set[str]] = {p.id: set() for p in pages}
     for p in pages:
         for tgt in p.links():
@@ -46,30 +33,23 @@ def _neighbours(pages, ids) -> dict[str, set[str]]:
 
 
 def build_graph(m: dict) -> str:
-    """A line-free overview: one node per page, labelled with its connection
-    count and coloured by confidence. Relationships live in the table below —
-    the graph deliberately draws no edges so it never turns into a hairball."""
     pages = list(iter_pages(m))
     band_color = {b["label"]: b["color"] for b in m["confidence_policy"]["bands"]}
-    ids = {p.id for p in pages}
-    nb = _neighbours(pages, ids)
-
     lines = ["```mermaid", "graph LR"]
-    styles: list[str] = []
-    for p in sorted(pages, key=lambda p: (-len(nb[p.id]), p.id)):
-        conf = float(p.frontmatter.get("confidence", 0.0) or 0.0)
-        band = confidence_band(conf, m)
-        title = str(p.frontmatter.get("title", p.id)).replace('"', "'")
-        ptype = TYPE_LABEL.get(p.type, p.type or "page")
-        pre, suf = TYPE_SHAPE.get(p.type, ("[", "]"))
-        sid = _safe(p.id)
-        count = len(nb[p.id])
-        label = (f'{title}<br/><small>{ptype} · {conf} {band}</small>'
-                 f'<br/><b>{count}🔗</b>')
-        lines.append(f'  {sid}{pre}"{label}"{suf}')
-        styles.append(f'  style {sid} fill:{band_color[band]}22,'
-                      f'stroke:{band_color[band]},stroke-width:2px,color:#212529')
-    lines.extend(styles)
+    for p in pages:
+        conf = p.frontmatter.get("confidence", 0.0) or 0.0
+        band = confidence_band(float(conf), m)
+        label = p.frontmatter.get("title", p.id).replace('"', "'")
+        lines.append(f'  {p.id.replace("-", "_")}["{label}<br/>{conf} · {band}"]')
+        lines.append(f'  style {p.id.replace("-", "_")} fill:{band_color[band]}22,'
+                     f'stroke:{band_color[band]}')
+    seen = set()
+    ids = {p.id for p in pages}
+    for p in pages:
+        for tgt in p.links():
+            if tgt in ids and (p.id, tgt) not in seen:
+                seen.add((p.id, tgt))
+                lines.append(f'  {p.id.replace("-", "_")} --> {tgt.replace("-", "_")}')
     lines.append("```")
     return "\n".join(lines)
 
@@ -135,20 +115,9 @@ def main() -> int:
     m = load_manifest()
     # The homepage (site root) is the knowledge graph itself.
     home_path = KB_ROOT / m["paths"]["wiki"] / "index.md"
-    intro = (
-        "---\ntitle: Knowledge Graph\n---\n\n# Knowledge Graph\n\n"
-        "Every page in the wiki at a glance — no tangle of link lines. "
-        "Each card reads as:\n\n"
-        "- **Shape = type** — `(concept)` rounded, `([entity])` stadium, "
-        "`[/source/]` document.\n"
-        "- **Colour = confidence** — green `high` (≥0.75), orange `medium` "
-        "(≥0.45), red `low`; the score sits under the title.\n"
-        "- **`N🔗` = connections** — how many other pages this one is linked "
-        "to. Cards are ordered by that count, so the hubs come first.\n\n"
-        "The exact **who-links-to-whom** is in the table below the graph, "
-        "so the relationships stay readable without drawing every edge.\n\n"
-        "Regenerate after any content change with `python tools/kb.py viz`.\n\n"
-    )
+    intro = ("---\ntitle: Knowledge Graph\n---\n\n# Knowledge Graph\n\n"
+             "Nodes colored by confidence band. Regenerate with "
+             "`python tools/kb.py viz`.\n\n")
     body = build_graph(m) + "\n\n## Connections\n\n" + build_table(m) + "\n"
     home_path.write_text(intro + body)
     print(f"generated {home_path.relative_to(KB_ROOT)}")
