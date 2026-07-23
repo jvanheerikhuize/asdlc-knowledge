@@ -4,7 +4,7 @@ title: "LLM Wiki Pattern"
 type: concept
 status: verified
 confidence: 0.8
-sources: [karpathy-llm-wiki]
+sources: [karpathy-llm-wiki, llm-wiki-setup-guide-2026]
 created: 2026-07-23
 updated: 2026-07-23
 last_verified: 2026-07-23
@@ -34,3 +34,11 @@ The bottleneck in knowledge bases is *bookkeeping*, not thinking — precisely t
 maintenance work an agent can do tirelessly. [[asdlc-knowledge-base|This KB]]
 extends the pattern with an explicit confidence/fact-check policy and a binary
 ingestion layer so the wiki stays both broad and trustworthy.
+
+## Known limits
+A practitioner report ([[llm-wiki-setup-guide-2026]]) running the pattern daily
+for three months finds it degrades past **~200 files**, once the agent can no
+longer hold the whole page graph in context; the mitigation is **directory-level
+indexes**. The same report frames the trade-off against
+[[retrieval-augmented-generation]] as *horizontal* scale (more documents, RAG)
+vs. *vertical* scale (deeper synthesis, the wiki).

@@ -13,6 +13,13 @@ Ingested the repo's own README into [[asdlc-knowledge-readme]] and added the
 [[retrieval-augmented-generation]], and [[andrej-karpathy]]. The KB now
 documents itself.
 
+## [2026-07-23] ingest | LLM Wiki Setup guide (Ganglani, 2026)
+Ingested a practitioner blog report as [[llm-wiki-setup-guide-2026]] (PDF via
+markitdown). Added its field experience to [[llm-wiki-pattern]] (the ~200-file
+scaling limit and directory-index fix), [[retrieval-augmented-generation]] (the
+horizontal-vs-vertical scale framing), and [[andrej-karpathy]] (gist provenance),
+with the source id added to each page's `sources:`.
+
 ## [2026-07-23] ingest | Retrieval-Augmented Generation (Lewis et al. 2020)
 Ingested arXiv:2005.11401 into [[rag-lewis-2020]]. Added the
 [[retrieval-augmented-generation]] concept (contrasted with [[llm-wiki-pattern]])

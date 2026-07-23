@@ -4,7 +4,7 @@ title: "Retrieval-Augmented Generation (RAG)"
 type: concept
 status: verified
 confidence: 0.8
-sources: [rag-lewis-2020]
+sources: [rag-lewis-2020, llm-wiki-setup-guide-2026]
 created: 2026-07-23
 updated: 2026-07-23
 last_verified: 2026-07-23
@@ -43,4 +43,7 @@ knowledge it wasn't trained on?* — with opposite trade-offs:
   Cheap to read and auditable, but requires ongoing bookkeeping to stay current.
 
 They are complementary: a wiki can be the curated, high-confidence layer over a
-larger corpus that RAG still searches on demand.
+larger corpus that RAG still searches on demand. A practitioner report
+([[llm-wiki-setup-guide-2026]]) puts the rule of thumb bluntly: reach for RAG to
+search 100k support tickets, and for the [[llm-wiki-pattern]] to synthesise 50
+research papers into one coherent understanding.

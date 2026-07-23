@@ -13,6 +13,7 @@ generated_by: tools/scaffold.py
 <!-- kb:sources:start -->
 - [[asdlc-knowledge-readme]] — The project README for [[asdlc-knowledge-base]]: a persistent, file-ba · **high**
 - [[karpathy-llm-wiki]] — The originating source for this knowledge base's design. Defines the · **high**
+- [[llm-wiki-setup-guide-2026]] — A practitioner report on running the [[llm-wiki-pattern]] daily for th · **medium**
 - [[rag-lewis-2020]] — The paper that named and formalised [[retrieval-augmented-generation]] · **high**
 <!-- kb:sources:end -->
 
