@@ -84,11 +84,13 @@ ingested raw gist.
 
 ## 6. Roadmap
 
-- **`kb purge` — easily purge the contents.** A single command to empty the
-  knowledge base back to a clean, scaffolded state: clear `raw/` and the
-  `wiki/` page folders, reset the generated views (`index.md` marker blocks,
-  `wiki/_graph.md`, `mkdocs.yml`), and leave `manifest.yaml`, `AGENTS.md`, and
-  `tools/` untouched. Guard it behind a `--yes` confirmation (dry-run by
-  default, printing what would be removed) so a purge is never accidental, and
-  add `--raw`/`--wiki` scopes to purge one layer without the other. Follows the
+### Shipped
+
+- **`kb purge` — easily purge the contents.** ✅ Shipped. A single command
+  empties the knowledge base back to a clean, scaffolded state: it clears `raw/`
+  and the `wiki/` page folders, resets the generated views (`index.md` marker
+  blocks, `wiki/index.md`, `mkdocs.yml`), and leaves `manifest.yaml`,
+  `AGENTS.md`, and `tools/` untouched. It is guarded behind a `--yes`
+  confirmation (dry-run by default, printing what would be removed) so a purge
+  is never accidental, and `--raw`/`--wiki` scope it to one layer. Follows the
   same manifest-driven, no-infra pattern as the existing operations.
