@@ -2,8 +2,9 @@
 
 No server or infra needed to build. Emits:
   - mkdocs.yml         (MkDocs Material config; nav derived from wiki/)
-  - wiki/_graph.md     (Mermaid graph of [[wikilinks]], nodes colored by
-                        confidence band)
+  - wiki/index.md      (site homepage: a Mermaid graph of [[wikilinks]], nodes
+                        colored by confidence band — MkDocs serves it at the
+                        site root)
 
 `mkdocs build` then produces a searchable, browsable HTML site; the publish
 GitHub Action deploys it to Pages. Everything is regenerated from files, so the
@@ -41,7 +42,8 @@ def build_graph(m: dict) -> str:
 def build_mkdocs(m: dict) -> str:
     wiki = KB_ROOT / m["paths"]["wiki"]
     # Enumerate real files so `mkdocs build --strict` never sees an unlisted page.
-    nav = ["  - Overview: _graph.md"]
+    # index.md is the homepage MkDocs serves at the site root.
+    nav = ["  - Overview: index.md"]
     for tspec in m["page_types"].values():
         folder = tspec["folder"]
         files = sorted((wiki / folder).glob("*.md"))
@@ -77,11 +79,12 @@ nav:
 
 def main() -> int:
     m = load_manifest()
-    graph_path = KB_ROOT / m["paths"]["wiki"] / "_graph.md"
-    graph_path.write_text("---\ntitle: Knowledge Graph\n---\n\n# Knowledge Graph\n\n"
-                          "Nodes colored by confidence band. Regenerate with "
-                          "`python tools/kb.py viz`.\n\n" + build_graph(m) + "\n")
-    print(f"generated {graph_path.relative_to(KB_ROOT)}")
+    # The homepage (site root) is the knowledge graph itself.
+    home_path = KB_ROOT / m["paths"]["wiki"] / "index.md"
+    home_path.write_text("---\ntitle: Knowledge Graph\n---\n\n# Knowledge Graph\n\n"
+                         "Nodes colored by confidence band. Regenerate with "
+                         "`python tools/kb.py viz`.\n\n" + build_graph(m) + "\n")
+    print(f"generated {home_path.relative_to(KB_ROOT)}")
     mk = KB_ROOT / "mkdocs.yml"
     mk.write_text(build_mkdocs(m))
     print(f"generated {mk.relative_to(KB_ROOT)}")

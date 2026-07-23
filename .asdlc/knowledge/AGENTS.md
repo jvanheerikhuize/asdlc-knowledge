@@ -67,7 +67,7 @@ files under `_schema/` or `_templates/` — change the manifest and re-run.
 
 ### `purge` — empty the KB back to a clean state
 `kb purge` clears `raw/` and the `wiki/` page folders and regenerates the
-derived views (`index.md` blocks, `wiki/_graph.md`, `mkdocs.yml`); the manifest,
+derived views (`index.md` blocks, `wiki/index.md`, `mkdocs.yml`); the manifest,
 schema, templates, `AGENTS.md`, and `tools/` are left untouched. It is **dry-run
 by default** — it prints what it would remove and changes nothing until you pass
 `--yes`. Scope it with `--raw` or `--wiki` to purge a single layer. This is

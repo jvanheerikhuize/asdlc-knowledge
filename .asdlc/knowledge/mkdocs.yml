@@ -19,7 +19,7 @@ markdown_extensions:
 plugins:
   - search
 nav:
-  - Overview: _graph.md
+  - Overview: index.md
   - Sources:
       - karpathy-llm-wiki: sources/karpathy-llm-wiki.md
   - Entities:

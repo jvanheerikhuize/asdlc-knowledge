@@ -20,7 +20,7 @@ consistent. Nothing runs as a service. The whole system is four moving parts:
 ├── _schema/              # (2) JSON Schema, generated
 ├── _templates/           # (2) page templates, generated
 ├── raw/                  # (3) immutable sources
-├── wiki/                 # (3) sources/ entities/ concepts/ + _graph.md
+├── wiki/                 # (3) sources/ entities/ concepts/ + index.md (graph homepage)
 ├── ingest/               # (4) adapter interface + backends
 └── tools/                # (4) kb CLI: scaffold/ingest/index/lint/verify/viz
 ```
@@ -101,12 +101,13 @@ Two enforcement layers:
 
 `kb viz` emits:
 - `mkdocs.yml` — MkDocs Material config (search, navigation).
-- `wiki/_graph.md` — a Mermaid graph of pages linked by `[[wikilinks]]`, nodes
-  colored by confidence band.
+- `wiki/index.md` — the site homepage: a Mermaid graph of pages linked by
+  `[[wikilinks]]`, nodes colored by confidence band. It is named `index.md` so
+  MkDocs serves it at the site root (`/`) rather than 404-ing there.
 
 `mkdocs build` renders a static HTML site (publishable to GitHub Pages via
 `.github/workflows/publish.yml`). No server, consistent with the file-based
-constraint. `_graph.md` is a generated *view* and is excluded from page linting.
+constraint. The generated `index.md` is a *view* and is excluded from page linting.
 
 ## 7. Interaction interface
 
@@ -117,7 +118,7 @@ markitdown, docling, mkdocs-material) declared in `pyproject.toml`.
 
 `kb purge` empties the KB back to a clean, scaffolded state — it clears `raw/`
 and the `wiki/` page folders and regenerates the derived views (`index.md`
-blocks, `wiki/_graph.md`, `mkdocs.yml`), leaving `manifest.yaml`, `AGENTS.md`,
+blocks, `wiki/index.md`, `mkdocs.yml`), leaving `manifest.yaml`, `AGENTS.md`,
 and `tools/` untouched. It is dry-run by default (printing what it would remove)
 and only writes with `--yes`; `--raw`/`--wiki` scope it to one layer.
 
