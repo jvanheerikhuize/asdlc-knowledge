@@ -7,6 +7,11 @@ description: Append-only, chronological record of KB operations. Newest at top.
 
 Format: `## [YYYY-MM-DD] operation | Title` followed by a short note.
 
+## [2026-07-23] ingest | Retrieval-Augmented Generation (Lewis et al. 2020)
+Ingested arXiv:2005.11401 into [[rag-lewis-2020]]. Added the
+[[retrieval-augmented-generation]] concept (contrasted with [[llm-wiki-pattern]])
+and the [[patrick-lewis]] entity, with bidirectional links.
+
 ## [2026-07-23] scaffold | Initial knowledge base
 Bootstrapped the KB from `manifest.yaml`. Generated schema, templates, and the
 three seed pages demonstrating the ingest -> wiki -> confidence flow.
