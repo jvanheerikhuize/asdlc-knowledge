@@ -45,7 +45,7 @@ tree then differs (see `.github/workflows/scaffold.yml`) — this is how the
 `AGENTS.md` is the one document an agent reads first. It is deliberately
 vendor-neutral (the `AGENTS.md` convention, not a `CLAUDE.md`/Cursor/Copilot-specific
 file), so any agent or human follows the same contract. It documents the layers,
-the six operations, the page conventions, the confidence rubric, and hard
+the operations, the page conventions, the confidence rubric, and hard
 guardrails (never edit `raw/`, never invent source IDs). The *interaction* happens
 through the `kb` CLI, which is equally agent- and human-usable.
 
@@ -110,10 +110,16 @@ constraint. `_graph.md` is a generated *view* and is excluded from page linting.
 
 ## 7. Interaction interface
 
-`tools/kb.py` is the single CLI dispatching all six operations. It is the
+`tools/kb.py` is the single CLI dispatching every operation. It is the
 programmatic surface for humans and agents alike; `AGENTS.md` is its prose
 counterpart. All logic is stdlib + PyYAML, with optional extras (jsonschema,
 markitdown, docling, mkdocs-material) declared in `pyproject.toml`.
+
+`kb purge` empties the KB back to a clean, scaffolded state — it clears `raw/`
+and the `wiki/` page folders and regenerates the derived views (`index.md`
+blocks, `wiki/_graph.md`, `mkdocs.yml`), leaving `manifest.yaml`, `AGENTS.md`,
+and `tools/` untouched. It is dry-run by default (printing what it would remove)
+and only writes with `--yes`; `--raw`/`--wiki` scope it to one layer.
 
 ## 8. CI/CD
 

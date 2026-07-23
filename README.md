@@ -56,6 +56,7 @@ mkdocs build                      # render the static visualization site
 - **lint** — schema, broken-link, orphan, unsourced, confidence-cap, and staleness checks.
 - **verify** — assemble a page with its cited sources so an agent can fact-check it.
 - **viz** — emit `mkdocs.yml` + a confidence-colored Mermaid link graph.
+- **purge** — empty the KB back to a clean state (dry-run by default; `--yes` to apply, `--raw`/`--wiki` to scope one layer).
 
 ## Confidence & fact-checking
 
