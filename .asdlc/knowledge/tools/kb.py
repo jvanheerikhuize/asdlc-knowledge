@@ -7,6 +7,8 @@
     kb verify <page-id>  assemble a page + its sources for fact-checking
     kb viz               regenerate mkdocs.yml + the Mermaid graph
     kb index             rebuild index.md from wiki/ frontmatter
+    kb purge [--raw|--wiki] [--yes]
+                         empty the KB back to a clean state (dry-run without --yes)
 
 This is the interaction interface for humans and agents alike; the agent's
 prose contract lives next to it in AGENTS.md.
@@ -77,6 +79,12 @@ def main(argv: list[str]) -> int:
         if "--adapter" in rest:
             ns["adapter"] = rest[rest.index("--adapter") + 1]
         return ingest.run(**ns)
+    if cmd == "purge":
+        import purge
+        raw, wiki = "--raw" in rest, "--wiki" in rest
+        # Neither or both flags means "everything".
+        scope = "all" if raw == wiki else ("raw" if raw else "wiki")
+        return purge.run(scope=scope, yes="--yes" in rest)
     if cmd == "verify":
         import verify
         if not rest:
