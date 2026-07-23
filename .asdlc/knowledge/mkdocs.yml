@@ -16,6 +16,9 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+extra_javascript:
+  # Powers the homepage 3D view (global ForceGraph3D); bundles three.js.
+  - https://cdn.jsdelivr.net/npm/3d-force-graph@1
 plugins:
   - search
 nav:
