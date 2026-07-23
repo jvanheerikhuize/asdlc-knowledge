@@ -1,0 +1,252 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://asdlc.dev/knowledge/frontmatter.schema.json",
+  "title": "ASDLC Knowledge Base \u2014 page frontmatter",
+  "description": "GENERATED from manifest.yaml. Do not edit by hand.",
+  "oneOf": [
+    {
+      "title": "Source",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable kebab-case slug; also the filename."
+        },
+        "title": {
+          "type": "string",
+          "description": "Human-readable page title."
+        },
+        "type": {
+          "const": "source"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "verified",
+            "stale",
+            "disputed"
+          ],
+          "description": "Editorial state. `verified` requires a passing fact-check."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Aggregate confidence 0-1. See confidence_policy below."
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "IDs of source pages backing this page. Empty => unsupported => capped confidence."
+        },
+        "created": {
+          "type": "string",
+          "description": "ISO date the page was created."
+        },
+        "updated": {
+          "type": "string",
+          "description": "ISO date of last content change."
+        },
+        "last_verified": {
+          "type": "string",
+          "description": "ISO date fact-check last passed."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Free-form topical tags."
+        },
+        "origin": {
+          "type": "string",
+          "description": "Path under raw/ or a URL."
+        },
+        "media_type": {
+          "type": "string",
+          "description": "pdf|docx|html|audio|image|text"
+        },
+        "ingested_with": {
+          "type": "string",
+          "description": "Ingestion adapter used."
+        },
+        "checksum": {
+          "type": "string",
+          "description": "sha256 of the raw artifact."
+        }
+      },
+      "required": [
+        "confidence",
+        "created",
+        "id",
+        "media_type",
+        "origin",
+        "sources",
+        "status",
+        "title",
+        "type",
+        "updated"
+      ],
+      "additionalProperties": true
+    },
+    {
+      "title": "Entity",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable kebab-case slug; also the filename."
+        },
+        "title": {
+          "type": "string",
+          "description": "Human-readable page title."
+        },
+        "type": {
+          "const": "entity"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "verified",
+            "stale",
+            "disputed"
+          ],
+          "description": "Editorial state. `verified` requires a passing fact-check."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Aggregate confidence 0-1. See confidence_policy below."
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "IDs of source pages backing this page. Empty => unsupported => capped confidence."
+        },
+        "created": {
+          "type": "string",
+          "description": "ISO date the page was created."
+        },
+        "updated": {
+          "type": "string",
+          "description": "ISO date of last content change."
+        },
+        "last_verified": {
+          "type": "string",
+          "description": "ISO date fact-check last passed."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Free-form topical tags."
+        },
+        "entity_type": {
+          "type": "string",
+          "description": "person|org|system|product|dataset"
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Other names this entity is known by."
+        }
+      },
+      "required": [
+        "confidence",
+        "created",
+        "entity_type",
+        "id",
+        "sources",
+        "status",
+        "title",
+        "type",
+        "updated"
+      ],
+      "additionalProperties": true
+    },
+    {
+      "title": "Concept",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Stable kebab-case slug; also the filename."
+        },
+        "title": {
+          "type": "string",
+          "description": "Human-readable page title."
+        },
+        "type": {
+          "const": "concept"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "draft",
+            "verified",
+            "stale",
+            "disputed"
+          ],
+          "description": "Editorial state. `verified` requires a passing fact-check."
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Aggregate confidence 0-1. See confidence_policy below."
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "IDs of source pages backing this page. Empty => unsupported => capped confidence."
+        },
+        "created": {
+          "type": "string",
+          "description": "ISO date the page was created."
+        },
+        "updated": {
+          "type": "string",
+          "description": "ISO date of last content change."
+        },
+        "last_verified": {
+          "type": "string",
+          "description": "ISO date fact-check last passed."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Free-form topical tags."
+        },
+        "category": {
+          "type": "string",
+          "description": "Optional grouping tag."
+        }
+      },
+      "required": [
+        "confidence",
+        "created",
+        "id",
+        "sources",
+        "status",
+        "title",
+        "type",
+        "updated"
+      ],
+      "additionalProperties": true
+    }
+  ]
+}
