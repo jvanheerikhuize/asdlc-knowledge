@@ -64,7 +64,7 @@ whose prose contract for agents lives beside it in `AGENTS.md` (6).
 | # | Requirement | Where it's met |
 |---|-------------|----------------|
 | 1 | Human-readable | Plain markdown + YAML; `index.md`; MkDocs site |
-| 2 | Single source of truth + scaffolder in pipeline | `manifest.yaml` → `kb scaffold`; `.github/workflows/scaffold.yml` |
+| 2 | Single source of truth + scaffolder in pipeline | `manifest.yaml` → `kb scaffold`; `azure-pipelines.yml` (ScaffoldDrift) / `.github/workflows/scaffold.yml` |
 | 3 | File-based, no infra | Only files; CLI is stdlib + PyYAML |
 | 4 | Industry standard | AGENTS.md, JSON Schema, frontmatter/wikilinks, MarkItDown/Docling, MkDocs Material |
 | 5 | Lives in `.asdlc/knowledge` | Entire KB rooted there |

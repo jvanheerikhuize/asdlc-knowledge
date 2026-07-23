@@ -8,8 +8,8 @@
 #   - lint thresholds & policies        (tools/lint.py)
 #   - the viz site config               (tools/viz.py -> mkdocs.yml)
 #
-# Edit this file, then run `python tools/kb.py scaffold` (or trigger the
-# "scaffold" GitHub Action). Never hand-edit generated artifacts.
+# Edit this file, then run `python tools/kb.py scaffold` (or let the CI drift
+# check — ADO ScaffoldDrift / GH scaffold.yml — catch it). Never hand-edit generated artifacts.
 # ─────────────────────────────────────────────────────────────────────────────
 
 version: 1

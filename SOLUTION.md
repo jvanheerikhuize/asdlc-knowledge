@@ -37,7 +37,8 @@ confidence policy, lint toggles, ingestion adapter order, and viz config.
 
 Because schema and templates are *generated*, they can never drift from the
 manifest. CI re-runs scaffold on any manifest change and fails if the working
-tree then differs (see `.github/workflows/scaffold.yml`) — this is how the
+tree then differs (the **ScaffoldDrift** stage in `azure-pipelines.yml`, or
+`.github/workflows/scaffold.yml`) — this is how the
 "scaffolder triggerable from a pipeline" requirement is enforced, not just offered.
 
 ## 2. Agent entry point & agnosticism
@@ -105,7 +106,8 @@ Two enforcement layers:
   `[[wikilinks]]`, nodes colored by confidence band. It is named `index.md` so
   MkDocs serves it at the site root (`/`) rather than 404-ing there.
 
-`mkdocs build` renders a static HTML site (publishable to GitHub Pages via
+`mkdocs build` renders a static HTML site (published as a pipeline artifact by
+the **Publish** stage of `azure-pipelines.yml`, or to GitHub Pages via
 `.github/workflows/publish.yml`). No server, consistent with the file-based
 constraint. The generated `index.md` is a *view* and is excluded from page linting.
 
@@ -124,9 +126,16 @@ and only writes with `--yes`; `--raw`/`--wiki` scope it to one layer.
 
 ## 8. CI/CD
 
-- `scaffold.yml` — on manifest change, re-run scaffold; fail if artifacts drift.
-- `validate.yml` — run `kb lint --strict` on every push/PR.
-- `publish.yml` — build the MkDocs site and deploy to GitHub Pages.
+The same three checks ship for both CI systems, all driven by the `kb` CLI:
+
+| Check | Azure DevOps (`azure-pipelines.yml`) | GitHub Actions (`.github/workflows/`) |
+|-------|--------------------------------------|----------------------------------------|
+| Lint `kb lint --strict` on every push/PR | **Validate** stage | `validate.yml` |
+| Regenerate from `manifest.yaml`; fail on drift | **ScaffoldDrift** stage | `scaffold.yml` |
+| Build the MkDocs site | **Publish** stage → pipeline artifact | `publish.yml` → GitHub Pages |
+
+Azure DevOps is the target for consuming repos; the GitHub workflows are kept so
+the template also runs unchanged on GitHub.
 
 ## 9. Verification
 

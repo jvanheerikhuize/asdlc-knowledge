@@ -1,0 +1,104 @@
+# Azure DevOps pipeline for the asdlc-knowledge base.
+#
+# Mirrors the three GitHub Actions workflows (kept under .github/workflows/ for
+# GitHub compatibility) in one ADO-native pipeline, so the repo runs unchanged
+# once onboarded into Azure DevOps:
+#   - Validate       (was validate.yml) — deterministic health check on every run.
+#   - ScaffoldDrift  (was scaffold.yml) — regenerate from manifest.yaml, fail on drift.
+#   - Publish        (was publish.yml)  — build the MkDocs site, publish as a
+#                                         pipeline artifact (the no-infra ADO
+#                                         equivalent of GitHub Pages).
+#
+# All operations go through the single `kb` CLI, keeping the file-based,
+# manifest-driven contract intact.
+
+trigger:
+  branches:
+    include:
+      - "*"
+
+# NOTE: For Azure Repos Git, YAML `pr:` triggers are ignored — configure a
+# "Build validation" branch policy on `main` pointing at this pipeline instead.
+# This block is honoured when the repo is hosted on GitHub.
+pr:
+  branches:
+    include:
+      - "*"
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  pythonVersion: "3.12"
+  kbDir: ".asdlc/knowledge"
+
+stages:
+  - stage: Validate
+    displayName: "kb lint --strict"
+    jobs:
+      - job: lint
+        displayName: "Deterministic health check"
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: "$(pythonVersion)"
+          - script: pip install pyyaml jsonschema
+            displayName: "Install deps"
+          - script: python3 tools/kb.py lint --strict
+            workingDirectory: "$(kbDir)"
+            displayName: "kb lint --strict"
+
+  - stage: ScaffoldDrift
+    displayName: "Scaffold drift check"
+    dependsOn: []            # run in parallel with Validate
+    jobs:
+      - job: scaffold
+        displayName: "Regenerate from manifest; fail if drifted"
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: "$(pythonVersion)"
+          - script: pip install pyyaml
+            displayName: "Install deps"
+          - script: python3 tools/kb.py scaffold
+            workingDirectory: "$(kbDir)"
+            displayName: "Regenerate from manifest"
+          - script: |
+              if ! git diff --exit-code -- "$(kbDir)/_schema" "$(kbDir)/_templates"; then
+                echo "##vso[task.logissue type=error]Generated schema/templates are out of date. Run 'kb scaffold' and commit."
+                exit 1
+              fi
+            displayName: "Fail if generated artifacts drifted"
+
+  - stage: Publish
+    displayName: "Build & publish viz site"
+    dependsOn:
+      - Validate
+    # Only on main, and never for PR validation runs.
+    condition: >-
+      and(succeeded(),
+          eq(variables['Build.SourceBranch'], 'refs/heads/main'),
+          ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - job: build
+        displayName: "MkDocs build → pipeline artifact"
+        steps:
+          - task: UsePythonVersion@0
+            inputs:
+              versionSpec: "$(pythonVersion)"
+          - script: pip install pyyaml mkdocs-material pymdown-extensions
+            displayName: "Install deps"
+          - script: python3 tools/kb.py viz
+            workingDirectory: "$(kbDir)"
+            displayName: "Regenerate viz config + graph"
+          - script: mkdocs build --strict --site-dir site
+            workingDirectory: "$(kbDir)"
+            displayName: "Build site"
+          - task: PublishPipelineArtifact@1
+            inputs:
+              targetPath: "$(kbDir)/site"
+              artifact: "knowledge-site"
+            displayName: "Publish site artifact"
+          # To host the site instead of only archiving it, add an Azure Static
+          # Web Apps deploy (AzureStaticWebApp@0) or push $(kbDir)/site to an
+          # Azure Storage $web container here — both keep the no-server model.

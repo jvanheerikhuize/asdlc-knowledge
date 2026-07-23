@@ -6,8 +6,8 @@ No server or infra needed to build. Emits:
                         colored by confidence band — MkDocs serves it at the
                         site root)
 
-`mkdocs build` then produces a searchable, browsable HTML site; the publish
-GitHub Action deploys it to Pages. Everything is regenerated from files, so the
+`mkdocs build` then produces a searchable, browsable HTML site; CI publishes it
+(ADO pipeline artifact / GitHub Pages). Everything is regenerated from files, so the
 viz never drifts from the source of truth.
 """
 from __future__ import annotations

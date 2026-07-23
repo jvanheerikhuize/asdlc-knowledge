@@ -69,7 +69,8 @@ the `query` verb below.
 ### `lint` — health check
 Run `kb lint`. It reports: schema violations, orphan pages, broken wikilinks,
 unsourced claims, stale pages, and confidence-cap violations. Fix or file
-follow-ups. This is safe to run in CI (see `.github/workflows/validate.yml`).
+follow-ups. This is safe to run in CI (the **Validate** stage of `azure-pipelines.yml`,
+or `.github/workflows/validate.yml`).
 
 ### `verify` — fact-check & (re)score confidence
 1. For a page, re-read every source in its `sources:` list from `raw/`.
