@@ -3,6 +3,7 @@
 
     kb scaffold          regenerate structure from manifest.yaml
     kb new <type> <id>   stamp a page from _templates/<type>.md (--title "...")
+    kb search <term>     ranked grep over frontmatter + body, with excerpts
     kb ingest            batch-ingest every file dropped in inbox/
     kb ingest <path>     convert one raw file and scaffold a source page
     kb lint [--strict]   run deterministic health checks
@@ -75,6 +76,12 @@ def main(argv: list[str]) -> int:
             i = rest.index("--title")
             title = rest[i + 1]
         return new.run(type_, id_, title=title)
+    if cmd == "search":
+        import search
+        if not rest:
+            print("usage: kb search <term>", file=sys.stderr)
+            return 2
+        return search.run(" ".join(rest))
     if cmd == "lint":
         import lint
         return lint.run(strict="--strict" in rest)

@@ -25,7 +25,7 @@ the manifest wins.
 
 ## 2. The operations (your job)
 
-Everything you do is one of seven verbs. Each has a CLI entry (`tools/kb.py`)
+Everything you do is one of eight verbs. Each has a CLI entry (`tools/kb.py`)
 that handles the deterministic bookkeeping; you provide the judgement.
 
 ### `new` — start a page by hand (not via ingest)
@@ -35,6 +35,12 @@ that handles the deterministic bookkeeping; you provide the judgement.
 your own synthesis rather than a fresh ingested source. Fill in the body,
 `sources:`, and `[[wikilinks]]` yourself — `kb lint` will flag the page as an
 orphan/unsourced draft until you do.
+
+### `search` — find relevant pages
+`kb search <term>` scores every page by where the term hits (id > title >
+frontmatter fields > body) and prints ranked results with a matching
+excerpt. Use it instead of ad-hoc grepping `wiki/` — it's the CLI half of
+the `query` verb below.
 
 ### `ingest` — a new source arrived
 1. A file lands in `inbox/` (drop-zone) or `raw/`. Run `kb ingest` with no args
@@ -51,7 +57,9 @@ orphan/unsourced draft until you do.
 6. Run `kb lint` and fix what you introduced.
 
 ### `query` — someone asks a question
-1. Search `wiki/` (grep/index) for relevant pages; read them.
+1. Run `kb search <term>` to find relevant pages ranked by where the term
+   hits (id/title outrank a body mention), each with a matching excerpt; read
+   the pages it surfaces.
 2. Synthesise an answer **with citations** to page ids and their `sources`.
 3. State confidence honestly. If pages disagree, say so and mark them
    `status: disputed`.
