@@ -28,14 +28,14 @@ hooks:
 nav:
   - Overview: index.md
   - Sources:
-      - asdlc-knowledge-readme: sources/asdlc-knowledge-readme.md
-      - karpathy-llm-wiki: sources/karpathy-llm-wiki.md
-      - llm-wiki-setup-guide-2026: sources/llm-wiki-setup-guide-2026.md
-      - rag-lewis-2020: sources/rag-lewis-2020.md
+      - "ASDLC Knowledge Base \u2014 README": sources/asdlc-knowledge-readme.md
+      - "Karpathy \u2014 LLM Wiki gist": sources/karpathy-llm-wiki.md
+      - "Lewis et al. \u2014 Retrieval-Augmented Generation (2020)": sources/rag-lewis-2020.md
+      - "LLM Wiki Setup: Karpathy's Knowledge Base (2026 Guide)": sources/llm-wiki-setup-guide-2026.md
   - Entities:
-      - andrej-karpathy: entities/andrej-karpathy.md
-      - asdlc-knowledge-base: entities/asdlc-knowledge-base.md
-      - patrick-lewis: entities/patrick-lewis.md
+      - "Andrej Karpathy": entities/andrej-karpathy.md
+      - "ASDLC Knowledge Base": entities/asdlc-knowledge-base.md
+      - "Patrick Lewis": entities/patrick-lewis.md
   - Concepts:
-      - llm-wiki-pattern: concepts/llm-wiki-pattern.md
-      - retrieval-augmented-generation: concepts/retrieval-augmented-generation.md
+      - "LLM Wiki Pattern": concepts/llm-wiki-pattern.md
+      - "Retrieval-Augmented Generation (RAG)": concepts/retrieval-augmented-generation.md
