@@ -8,6 +8,7 @@
     kb ingest <path>     convert one raw file and scaffold a source page
     kb lint [--strict]   run deterministic health checks
     kb verify <page-id>  assemble a page + its sources for fact-checking
+    kb verify --all [--strict]  sweep every page's verification health
     kb viz               regenerate mkdocs.yml + the Mermaid graph
     kb index             rebuild index.md from wiki/ frontmatter
     kb purge [--raw|--wiki] [--yes]
@@ -109,8 +110,11 @@ def main(argv: list[str]) -> int:
         return purge.run(scope=scope, yes="--yes" in rest)
     if cmd == "verify":
         import verify
+        if "--all" in rest:
+            return verify.run_all(strict="--strict" in rest)
         if not rest:
-            print("usage: kb verify <page-id>", file=sys.stderr)
+            print("usage: kb verify <page-id> | kb verify --all [--strict]",
+                  file=sys.stderr)
             return 2
         return verify.run(rest[0])
     print(f"unknown command: {cmd}\n{__doc__}", file=sys.stderr)

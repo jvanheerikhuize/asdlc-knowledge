@@ -79,6 +79,10 @@ or `.github/workflows/validate.yml`).
 4. If all claims hold and coverage is good, set `status: verified`.
 `kb verify <page>` prints the claims + cited source excerpts to check against;
 the *judgement* is yours, the *scoring math and caps* are enforced by the tool.
+`kb verify --all` sweeps every page instead, printing a triage list (which pages
+are due for re-verification, stale, or unsourced) — the view a scheduled run uses
+to catch pages ageing past their staleness windows. `--all --strict` exits
+non-zero when any page needs attention.
 
 ### `scaffold` — regenerate structure from the manifest
 Run `kb scaffold` after editing `manifest.yaml`. Idempotent. Never hand-edit

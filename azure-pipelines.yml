@@ -25,6 +25,18 @@ pr:
     include:
       - "*"
 
+# Weekly staleness sweep. Staleness is time-relative (`verified_max_age_days` /
+# `stale_after_days`), so it only trips as the clock advances — a cron keeps a
+# quiet repo honest instead of waiting for the next push. `always: true` runs it
+# even with no new commits.
+schedules:
+  - cron: "0 6 * * 1"   # Mondays 06:00 UTC
+    displayName: Weekly staleness sweep
+    branches:
+      include:
+        - main
+    always: true
+
 pool:
   vmImage: ubuntu-latest
 
@@ -47,6 +59,9 @@ stages:
           - script: python3 tools/kb.py lint --strict
             workingDirectory: "$(kbDir)"
             displayName: "kb lint --strict"
+          - script: python3 tools/kb.py verify --all
+            workingDirectory: "$(kbDir)"
+            displayName: "kb verify --all (verification triage)"
 
   - stage: ScaffoldDrift
     displayName: "Scaffold drift check"

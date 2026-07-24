@@ -89,17 +89,13 @@ ingested raw gist.
 Ordered by value-for-effort; each follows the existing manifest-driven,
 stdlib+PyYAML, no-infra pattern.
 
-1. **Backlinks** — `kb index` (or a new `kb backlinks`) appends a generated
-   "Referenced by" block to each page (marker comments, like `index.md`).
-   Makes the graph navigable from any page, not just the homepage.
-2. **`kb verify --all` + scheduled staleness sweep** — iterate verify output
-   over every page, and add a weekly `schedule:` trigger to `validate.yml` so
-   `verified_max_age_days`/`stale_after_days` actually fire over time, not only
-   when someone happens to push.
-3. **URL ingestion** — let `kb ingest <url>` fetch and snapshot a web page into
+1. ~~**Backlinks**~~ — superseded by *Wiki-grade* item 5 ("Referenced by"
+   backlinks), which computes the same block at build time with no marker
+   comments to drift. See Shipped.
+2. **URL ingestion** — let `kb ingest <url>` fetch and snapshot a web page into
    `raw/` (markitdown already converts HTML). Most new knowledge arrives as
    links, not files.
-4. **Near-duplicate warning on ingest** — checksums already catch identical
+3. **Near-duplicate warning on ingest** — checksums already catch identical
    files; add a slug/title-similarity warning so re-ingesting the same document
    under a new name gets flagged instead of silently forking a second source page.
 
@@ -164,6 +160,14 @@ regenerated from the manifest and the existing link graph, and gated by the same
 
 ### Shipped
 
+- **`kb verify --all` + scheduled staleness sweep.** ✅ Shipped. `verify --all`
+  classifies every page's verification health (`reverify` / `no-date` / `stale`
+  / `unsourced` / `unverified` / `ok`) and prints a triage list, most-actionable
+  first — the complement to `kb lint`'s pass/fail gate. `--strict` exits non-zero
+  when any page needs attention. A weekly `schedule:` cron on `validate.yml` (and
+  the `schedules:` block on `azure-pipelines.yml`) now runs the lint + sweep even
+  with no new commits, so the time-relative windows (`verified_max_age_days`,
+  `stale_after_days`) actually trip as pages age instead of waiting for a push.
 - **`kb search <term>` — ranked grep over frontmatter + body.** ✅ Shipped.
   Scores every page by where the term hits (id > title > other frontmatter >
   body), prints ranked page ids with a matching excerpt. The CLI half of the
