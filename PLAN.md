@@ -92,10 +92,7 @@ stdlib+PyYAML, no-infra pattern.
 1. ~~**Backlinks**~~ — superseded by *Wiki-grade* item 5 ("Referenced by"
    backlinks), which computes the same block at build time with no marker
    comments to drift. See Shipped.
-2. **URL ingestion** — let `kb ingest <url>` fetch and snapshot a web page into
-   `raw/` (markitdown already converts HTML). Most new knowledge arrives as
-   links, not files.
-3. **Near-duplicate warning on ingest** — checksums already catch identical
+2. **Near-duplicate warning on ingest** — checksums already catch identical
    files; add a slug/title-similarity warning so re-ingesting the same document
    under a new name gets flagged instead of silently forking a second source page.
 
@@ -160,6 +157,15 @@ regenerated from the manifest and the existing link graph, and gated by the same
 
 ### Shipped
 
+- **URL ingestion — `kb ingest <url>`.** ✅ Shipped. Most new knowledge arrives
+  as a link, not a file. `kb ingest <url>` fetches the page once with stdlib
+  `urllib` (no new dependency — honours the stdlib+PyYAML constraint), snapshots
+  the raw HTML into `raw/` (immutable, so the source stays fixed even if the site
+  later changes), and hands the saved `.html` to the ordinary adapter chain,
+  where the existing markitdown adapter converts it. The source page records the
+  original URL as `origin` and prefers the document's embedded `<title>` over the
+  filename stem. Re-running on an already-snapshotted URL reuses the existing raw
+  copy, preserving immutability. Reuses the whole ingest pipeline — no new infra.
 - **`kb verify --all` + scheduled staleness sweep.** ✅ Shipped. `verify --all`
   classifies every page's verification health (`reverify` / `no-date` / `stale`
   / `unsourced` / `unverified` / `ok`) and prints a triage list, most-actionable

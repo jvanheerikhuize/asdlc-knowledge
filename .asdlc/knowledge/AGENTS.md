@@ -46,6 +46,10 @@ the `query` verb below.
 1. A file lands in `inbox/` (drop-zone) or `raw/`. Run `kb ingest` with no args
    to batch-ingest the whole inbox — each file is copied into `raw/`, converted,
    and given a draft source page — or `kb ingest <path>` for one explicit file.
+   Knowledge often arrives as a link: `kb ingest <url>` fetches the page once,
+   snapshots the raw HTML into `raw/` (immutable, so the source stays fixed even
+   if the site later changes), and runs it through the same adapter chain
+   (markitdown converts HTML); the source page records the URL as its `origin`.
 2. Steps 1's scaffolding writes one **source page** per file under `wiki/sources/`
    (`origin`, `media_type`, `ingested_with`, `checksum` are filled in for you).
    The pages land as `status: draft` — the steps below turn them into real wiki.

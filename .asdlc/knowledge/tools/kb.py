@@ -6,6 +6,7 @@
     kb search <term>     ranked grep over frontmatter + body, with excerpts
     kb ingest            batch-ingest every file dropped in inbox/
     kb ingest <path>     convert one raw file and scaffold a source page
+    kb ingest <url>      fetch + snapshot a web page, then ingest it
     kb lint [--strict]   run deterministic health checks
     kb verify <page-id>  assemble a page + its sources for fact-checking
     kb verify --all [--strict]  sweep every page's verification health

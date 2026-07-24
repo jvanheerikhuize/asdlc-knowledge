@@ -1,15 +1,22 @@
 """Ingestion dispatcher.
 
-Two ways to run it:
+Three ways to run it:
 
     python tools/kb.py ingest                 # batch: ingest everything in inbox/
     python tools/kb.py ingest <path>          # single file (under raw/ or absolute)
-    python tools/kb.py ingest <path> --adapter NAME
+    python tools/kb.py ingest <url>           # fetch + snapshot a web page
+    python tools/kb.py ingest <path|url> --adapter NAME
 
 Batch mode is the friendly drop-zone workflow: drop files into `inbox/`, run
 `kb ingest`, and each file is copied into raw/ (immutable), converted to markdown
 by the first manifest-priority adapter that accepts it, scaffolded into a draft
 page under wiki/sources/, and then cleared out of the inbox.
+
+URL mode is the same pipeline for the common case where knowledge arrives as a
+link: `kb ingest https://…` downloads the page once into raw/ (immutable
+snapshot, so the page stays fixed even if the site later changes) and hands the
+saved `.html` to the ordinary adapter chain — markitdown converts HTML, so no
+new dependency is needed. The source page records the original URL as `origin`.
 
 The optional `markitdown` / `docling` backends are lazy-imported. If they are
 installed only in a local `.venv`, that virtualenv's site-packages are added to
@@ -21,9 +28,13 @@ from __future__ import annotations
 import argparse
 import datetime as dt
 import importlib
+import re
 import shutil
 import sys
+import urllib.error
+import urllib.request
 from pathlib import Path
+from urllib.parse import urlparse
 
 from _common import KB_ROOT, load_manifest
 
@@ -68,15 +79,23 @@ def _dispatch(src: Path, m: dict, adapter: str | None):
     return None
 
 
-def _scaffold_source(src: Path, result, m: dict) -> Path:
-    """Write a draft source page for an already-extracted result. Returns path."""
+def _scaffold_source(src: Path, result, m: dict, origin: str | None = None) -> Path:
+    """Write a draft source page for an already-extracted result. Returns path.
+
+    `origin` overrides the provenance line (e.g. the source URL for a snapshot);
+    it defaults to the file's path under raw/. The page title prefers a title the
+    adapter extracted from the document (markitdown reads a page's <title>),
+    falling back to the filename stem.
+    """
     sid = src.stem.lower().replace(" ", "-")
     out = KB_ROOT / m["paths"]["wiki"] / "sources" / f"{sid}.md"
     today = dt.date.today().isoformat()
-    origin = src.relative_to(KB_ROOT) if KB_ROOT in src.parents else src
+    if origin is None:
+        origin = str(src.relative_to(KB_ROOT) if KB_ROOT in src.parents else src)
+    title = (result.meta.get("title") or "").strip() or src.stem
     front = (
         "---\n"
-        f"id: {sid}\ntitle: {src.stem}\ntype: source\nstatus: draft\n"
+        f"id: {sid}\ntitle: {title}\ntype: source\nstatus: draft\n"
         f"confidence: 0.6\nsources: [{sid}]\n"
         f"created: {today}\nupdated: {today}\n"
         f"origin: {origin}\n"
@@ -84,7 +103,7 @@ def _scaffold_source(src: Path, result, m: dict) -> Path:
         f"checksum: {result.checksum}\n---\n\n"
     )
     body = (
-        f"# {src.stem}\n\n"
+        f"# {title}\n\n"
         "> Auto-ingested source. Summarise below, then update entity/concept pages.\n\n"
         f"{result.markdown}\n"
     )
@@ -92,10 +111,12 @@ def _scaffold_source(src: Path, result, m: dict) -> Path:
     return out
 
 
-def _ingest_file(src: Path, m: dict, adapter: str | None) -> tuple[str, str]:
+def _ingest_file(src: Path, m: dict, adapter: str | None,
+                 origin: str | None = None) -> tuple[str, str]:
     """Ingest one raw file. Returns (status, message).
 
     status is one of: "ok", "skip", "error". `src` must already live under raw/.
+    `origin` overrides the source page's provenance line (used for URL snapshots).
     """
     sid = src.stem.lower().replace(" ", "-")
     out = KB_ROOT / m["paths"]["wiki"] / "sources" / f"{sid}.md"
@@ -108,7 +129,7 @@ def _ingest_file(src: Path, m: dict, adapter: str | None) -> tuple[str, str]:
         result = chosen.extract(src)
     except Exception as exc:  # backend missing or conversion failed
         return "error", f"{src.name}: {chosen.name} failed — {exc}"
-    page = _scaffold_source(src, result, m)
+    page = _scaffold_source(src, result, m, origin=origin)
     rel = page.relative_to(KB_ROOT)
     return "ok", f"{src.name}: ingested via '{chosen.name}' -> {rel} ({len(result.markdown)} chars)"
 
@@ -158,6 +179,55 @@ def _run_batch(m: dict, adapter: str | None) -> int:
     return 1 if n_err else 0
 
 
+def _slug_from_url(url: str) -> str:
+    """A stable, filesystem-safe id for a URL: domain + path, minus noise.
+
+    e.g. https://karpathy.github.io/2019/04/25/recipe/ -> karpathy-github-io-2019-04-25-recipe
+    """
+    p = urlparse(url)
+    host = p.netloc.split("@")[-1].split(":")[0]
+    host = re.sub(r"^www\.", "", host)
+    slug = re.sub(r"[^a-z0-9]+", "-", f"{host} {p.path}".lower()).strip("-")
+    return slug[:60].strip("-") or "page"
+
+
+def _fetch_url(url: str, dest: Path) -> tuple[bool, str]:
+    """Download `url` into `dest` (bytes). Returns (ok, message)."""
+    req = urllib.request.Request(
+        url, headers={"User-Agent": "asdlc-knowledge kb-ingest (+stdlib urllib)"}
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = resp.read()
+    except (urllib.error.URLError, urllib.error.HTTPError, ValueError, OSError) as exc:
+        return False, f"fetch failed: {exc}"
+    dest.write_bytes(data)
+    return True, f"snapshotted {len(data)} bytes"
+
+
+def _run_url(url: str, m: dict, adapter: str | None) -> int:
+    """Fetch a web page, snapshot it into raw/, then ingest the saved file."""
+    raw_root = KB_ROOT / m["paths"]["raw"]
+    dest = raw_root / f"{_slug_from_url(url)}.html"
+    rel = dest.relative_to(KB_ROOT)
+    if dest.exists():
+        # raw/ is immutable — keep the original snapshot; ingest reflects it.
+        print(f"• {rel} already snapshotted — ingesting existing copy")
+    else:
+        raw_root.mkdir(parents=True, exist_ok=True)
+        ok, msg = _fetch_url(url, dest)
+        print(f"• {url}: {msg}")
+        if not ok:
+            return 1
+    status, msg = _ingest_file(dest, m, adapter, origin=url)
+    print(msg, file=sys.stderr if status == "error" else sys.stdout)
+    if status == "ok":
+        print("Next: summarise the draft, set confidence per the rubric, add "
+              "[[links]] to entity/concept pages, append to log.md, run `kb lint`.")
+        return 0
+    return 1 if status == "error" else 0
+
+
 def _run_single(path: str, m: dict, adapter: str | None) -> int:
     """Ingest one explicit path (relative to raw/, or absolute). Legacy form."""
     raw_root = KB_ROOT / m["paths"]["raw"]
@@ -181,6 +251,8 @@ def run(path: str | None = None, adapter: str | None = None) -> int:
     m = load_manifest()
     if path is None:
         return _run_batch(m, adapter)
+    if re.match(r"^https?://", path, re.IGNORECASE):
+        return _run_url(path, m, adapter)
     return _run_single(path, m, adapter)
 
 
