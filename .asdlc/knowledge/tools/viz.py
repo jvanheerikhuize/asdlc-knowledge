@@ -21,6 +21,18 @@ from _common import KB_ROOT, confidence_band, iter_pages, load_manifest
 TYPE_LABEL = {"concept": "concept", "entity": "entity", "source": "source"}
 
 
+def _folder_map(m: dict) -> dict[str, str]:
+    """type -> wiki subfolder, from the manifest (single source of truth)."""
+    return {t: spec["folder"] for t, spec in m["page_types"].items()}
+
+
+def _page_url(p, folders: dict[str, str]) -> str:
+    """Directory-style URL of a page relative to the site root (where the graph
+    homepage lives), matching MkDocs' default use_directory_urls."""
+    folder = folders.get(p.type, p.type or "page")
+    return f"{folder}/{p.id}/"
+
+
 def _neighbours(pages, ids) -> dict[str, set[str]]:
     """Undirected connectivity: for each page, the set of distinct other pages
     it links to or is linked from. Used to build the Connections table."""
@@ -35,15 +47,20 @@ def _neighbours(pages, ids) -> dict[str, set[str]]:
 
 def build_graph(m: dict) -> str:
     pages = list(iter_pages(m))
+    folders = _folder_map(m)
     band_color = {b["label"]: b["color"] for b in m["confidence_policy"]["bands"]}
     lines = ["```mermaid", "graph LR"]
     for p in pages:
         conf = p.frontmatter.get("confidence", 0.0) or 0.0
         band = confidence_band(float(conf), m)
         label = p.frontmatter.get("title", p.id).replace('"', "'")
-        lines.append(f'  {p.id.replace("-", "_")}["{label}<br/>{conf} · {band}"]')
-        lines.append(f'  style {p.id.replace("-", "_")} fill:{band_color[band]}22,'
+        node = p.id.replace("-", "_")
+        lines.append(f'  {node}["{label}<br/>{conf} · {band}"]')
+        lines.append(f'  style {node} fill:{band_color[band]}22,'
                      f'stroke:{band_color[band]}')
+        # Make each node navigate to its page (the graph becomes a map, not a
+        # picture). "_self" so it opens in place; MkDocs uses directory URLs.
+        lines.append(f'  click {node} "{_page_url(p, folders)}" "Open page" _self')
     seen = set()
     ids = {p.id for p in pages}
     for p in pages:
@@ -63,6 +80,7 @@ def build_graph_data(m: dict) -> dict:
     pages = list(iter_pages(m))
     ids = {p.id for p in pages}
     nb = _neighbours(pages, ids)
+    folders = _folder_map(m)
     band_color = {b["label"]: b["color"] for b in m["confidence_policy"]["bands"]}
     nodes = []
     for p in pages:
@@ -76,6 +94,7 @@ def build_graph_data(m: dict) -> dict:
             "band": band,
             "color": band_color[band],
             "val": max(1, len(nb[p.id])),
+            "href": _page_url(p, folders),
         })
     seen, links = set(), []
     for p in pages:
@@ -126,11 +145,13 @@ _VIEW_TEMPLATE = """<div class="kb-graph">
     .nodeColor(function(n){return n.color;})
     .nodeVal(function(n){return n.val;})
     .nodeRelSize(4)
-    .nodeLabel(function(n){return '<b>'+n.name+'</b><br>'+n.type+' · '+n.conf+' '+n.band;})
+    .nodeLabel(function(n){return '<b>'+n.name+'</b><br>'+n.type+' · '+n.conf+' '+n.band+'<br><small>click to focus · '+(navigator.platform.indexOf('Mac')>-1?'⌘':'Ctrl')+'/Shift-click to open</small>';})
     .linkColor(function(){return 'rgba(136,136,136,0.4)';})
     .linkWidth(0.5)
     .width(box.clientWidth).height(560);
-  g.onNodeClick(function(n){
+  g.onNodeClick(function(n,e){
+    // Modifier-click opens the page; a plain click focuses the camera on it.
+    if(e&&(e.shiftKey||e.ctrlKey||e.metaKey)){ if(n.href)window.location.href=n.href; return; }
     var r=1+90/Math.hypot(n.x||1,n.y||1,n.z||1);
     g.cameraPosition({x:(n.x||0)*r,y:(n.y||0)*r,z:(n.z||0)*r},n,1200);
   });
@@ -218,10 +239,12 @@ def main() -> int:
     # The homepage (site root) is the knowledge graph itself.
     home_path = KB_ROOT / m["paths"]["wiki"] / "index.md"
     intro = ("---\ntitle: Knowledge Graph\n---\n\n# Knowledge Graph\n\n"
-             "Nodes colored by confidence band. Use the **2D / 3D** toggle to "
-             "switch between the Mermaid diagram and an interactive "
-             "force-directed graph (drag to rotate, scroll to zoom, click a node "
-             "to focus). Regenerate with `python tools/kb.py viz`.\n\n")
+             "Nodes colored by confidence band, and every node is a link. Use the "
+             "**2D / 3D** toggle to switch between the Mermaid diagram and an "
+             "interactive force-directed graph. In **2D**, click a node to open "
+             "its page. In **3D**, drag to rotate and scroll to zoom; click a node "
+             "to focus the camera, or ⌘/Ctrl/Shift-click to open its page. "
+             "Regenerate with `python tools/kb.py viz`.\n\n")
     body = build_views(m) + "\n\n## Connections\n\n" + build_table(m) + "\n"
     home_path.write_text(intro + body)
     print(f"generated {home_path.relative_to(KB_ROOT)}")
