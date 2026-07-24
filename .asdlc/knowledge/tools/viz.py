@@ -193,7 +193,7 @@ def build_mkdocs(m: dict) -> str:
     wiki = KB_ROOT / m["paths"]["wiki"]
     # Enumerate real files so `mkdocs build --strict` never sees an unlisted page.
     # index.md is the homepage MkDocs serves at the site root.
-    nav = ["  - Overview: index.md"]
+    nav = ["  - Overview: index.md", "  - Tags: tags.md"]
     for tspec in m["page_types"].values():
         folder = tspec["folder"]
         files = sorted((wiki / folder).glob("*.md"))
@@ -233,6 +233,11 @@ extra_javascript:
   - https://cdn.jsdelivr.net/npm/3d-force-graph@1
 plugins:
   - search
+  # Material's built-in tags plugin (no extra dependency): turns the free-form
+  # `tags:` frontmatter into a browsable index. The `<!-- material/tags -->`
+  # marker in wiki/tags.md is where the plugin injects the grouped listing
+  # (the deprecated `tags_file:` option is intentionally omitted).
+  - tags
 # Resolve [[wikilinks]] -> real links at build time (tools/mkdocs_hooks.py).
 # Keeps wiki/ source canonical while the published site behaves like a wiki.
 hooks:
@@ -256,6 +261,15 @@ def main() -> int:
     body = build_views(m) + "\n\n## Connections\n\n" + build_table(m) + "\n"
     home_path.write_text(intro + body)
     print(f"generated {home_path.relative_to(KB_ROOT)}")
+    # The tag index: Material's tags plugin replaces the marker with a listing of
+    # every page grouped by its `tags:` frontmatter — a real browse surface.
+    tags_path = KB_ROOT / m["paths"]["wiki"] / "tags.md"
+    tags_path.write_text(
+        "---\ntitle: Tags\n---\n\n# Tags\n\n"
+        "Every page grouped by its `tags:` frontmatter — a browse-by-topic index "
+        "of the knowledge base. Regenerate with `python tools/kb.py viz`.\n\n"
+        "<!-- material/tags -->\n")
+    print(f"generated {tags_path.relative_to(KB_ROOT)}")
     mk = KB_ROOT / "mkdocs.yml"
     mk.write_text(build_mkdocs(m))
     print(f"generated {mk.relative_to(KB_ROOT)}")

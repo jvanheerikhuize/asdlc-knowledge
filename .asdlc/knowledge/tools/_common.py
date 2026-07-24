@@ -74,9 +74,10 @@ def iter_pages(manifest: dict | None = None):
     manifest = manifest or load_manifest()
     root = KB_ROOT / manifest["paths"]["wiki"]
     for p in sorted(root.rglob("*.md")):
-        # Skip generated views, not pages: `_`-prefixed artifacts and the
-        # generated homepage (wiki/index.md, the site-root knowledge graph).
-        if p.name.startswith("_") or p.name == "index.md":
+        # Skip generated views, not pages: `_`-prefixed artifacts, the generated
+        # homepage (wiki/index.md, the site-root knowledge graph), and the
+        # generated tag index (wiki/tags.md, Material's tags plugin surface).
+        if p.name.startswith("_") or p.name in ("index.md", "tags.md"):
             continue
         yield parse_page(p)
 

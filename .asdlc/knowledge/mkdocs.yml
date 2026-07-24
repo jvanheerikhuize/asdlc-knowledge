@@ -21,12 +21,18 @@ extra_javascript:
   - https://cdn.jsdelivr.net/npm/3d-force-graph@1
 plugins:
   - search
+  # Material's built-in tags plugin (no extra dependency): turns the free-form
+  # `tags:` frontmatter into a browsable index. The `<!-- material/tags -->`
+  # marker in wiki/tags.md is where the plugin injects the grouped listing
+  # (the deprecated `tags_file:` option is intentionally omitted).
+  - tags
 # Resolve [[wikilinks]] -> real links at build time (tools/mkdocs_hooks.py).
 # Keeps wiki/ source canonical while the published site behaves like a wiki.
 hooks:
   - tools/mkdocs_hooks.py
 nav:
   - Overview: index.md
+  - Tags: tags.md
   - Sources:
       - "ASDLC Knowledge Base \u2014 README": sources/asdlc-knowledge-readme.md
       - "Karpathy \u2014 LLM Wiki gist": sources/karpathy-llm-wiki.md
