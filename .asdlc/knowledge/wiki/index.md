@@ -109,12 +109,12 @@ graph LR
 
 | Page | Type | Confidence | 🔗 | Connects to |
 | --- | --- | --- | --- | --- |
-| **LLM Wiki Pattern** | concept | 0.8 high | 7 | `andrej-karpathy`, `asdlc-knowledge-base`, `asdlc-knowledge-readme`, `karpathy-llm-wiki`, `llm-wiki-setup-guide-2026`, `rag-lewis-2020`, `retrieval-augmented-generation` |
-| **Retrieval-Augmented Generation (RAG)** | concept | 0.8 high | 6 | `asdlc-knowledge-base`, `asdlc-knowledge-readme`, `llm-wiki-pattern`, `llm-wiki-setup-guide-2026`, `patrick-lewis`, `rag-lewis-2020` |
-| **Andrej Karpathy** | entity | 0.85 high | 5 | `asdlc-knowledge-base`, `asdlc-knowledge-readme`, `karpathy-llm-wiki`, `llm-wiki-pattern`, `llm-wiki-setup-guide-2026` |
-| **ASDLC Knowledge Base — README** | source | 0.9 high | 5 | `andrej-karpathy`, `asdlc-knowledge-base`, `karpathy-llm-wiki`, `llm-wiki-pattern`, `retrieval-augmented-generation` |
-| **ASDLC Knowledge Base** | entity | 0.9 high | 4 | `andrej-karpathy`, `asdlc-knowledge-readme`, `llm-wiki-pattern`, `retrieval-augmented-generation` |
-| **Karpathy — LLM Wiki gist** | source | 0.9 high | 3 | `andrej-karpathy`, `asdlc-knowledge-readme`, `llm-wiki-pattern` |
-| **LLM Wiki Setup: Karpathy's Knowledge Base (2026 Guide)** | source | 0.5 medium | 3 | `andrej-karpathy`, `llm-wiki-pattern`, `retrieval-augmented-generation` |
-| **Lewis et al. — Retrieval-Augmented Generation (2020)** | source | 0.85 high | 3 | `llm-wiki-pattern`, `patrick-lewis`, `retrieval-augmented-generation` |
-| **Patrick Lewis** | entity | 0.7 medium | 2 | `rag-lewis-2020`, `retrieval-augmented-generation` |
+| **[[llm-wiki-pattern]]** | concept | 0.8 high | 7 | [[andrej-karpathy|andrej-karpathy]], [[asdlc-knowledge-base|asdlc-knowledge-base]], [[asdlc-knowledge-readme|asdlc-knowledge-readme]], [[karpathy-llm-wiki|karpathy-llm-wiki]], [[llm-wiki-setup-guide-2026|llm-wiki-setup-guide-2026]], [[rag-lewis-2020|rag-lewis-2020]], [[retrieval-augmented-generation|retrieval-augmented-generation]] |
+| **[[retrieval-augmented-generation]]** | concept | 0.8 high | 6 | [[asdlc-knowledge-base|asdlc-knowledge-base]], [[asdlc-knowledge-readme|asdlc-knowledge-readme]], [[llm-wiki-pattern|llm-wiki-pattern]], [[llm-wiki-setup-guide-2026|llm-wiki-setup-guide-2026]], [[patrick-lewis|patrick-lewis]], [[rag-lewis-2020|rag-lewis-2020]] |
+| **[[andrej-karpathy]]** | entity | 0.85 high | 5 | [[asdlc-knowledge-base|asdlc-knowledge-base]], [[asdlc-knowledge-readme|asdlc-knowledge-readme]], [[karpathy-llm-wiki|karpathy-llm-wiki]], [[llm-wiki-pattern|llm-wiki-pattern]], [[llm-wiki-setup-guide-2026|llm-wiki-setup-guide-2026]] |
+| **[[asdlc-knowledge-readme]]** | source | 0.9 high | 5 | [[andrej-karpathy|andrej-karpathy]], [[asdlc-knowledge-base|asdlc-knowledge-base]], [[karpathy-llm-wiki|karpathy-llm-wiki]], [[llm-wiki-pattern|llm-wiki-pattern]], [[retrieval-augmented-generation|retrieval-augmented-generation]] |
+| **[[asdlc-knowledge-base]]** | entity | 0.9 high | 4 | [[andrej-karpathy|andrej-karpathy]], [[asdlc-knowledge-readme|asdlc-knowledge-readme]], [[llm-wiki-pattern|llm-wiki-pattern]], [[retrieval-augmented-generation|retrieval-augmented-generation]] |
+| **[[karpathy-llm-wiki]]** | source | 0.9 high | 3 | [[andrej-karpathy|andrej-karpathy]], [[asdlc-knowledge-readme|asdlc-knowledge-readme]], [[llm-wiki-pattern|llm-wiki-pattern]] |
+| **[[llm-wiki-setup-guide-2026]]** | source | 0.5 medium | 3 | [[andrej-karpathy|andrej-karpathy]], [[llm-wiki-pattern|llm-wiki-pattern]], [[retrieval-augmented-generation|retrieval-augmented-generation]] |
+| **[[rag-lewis-2020]]** | source | 0.85 high | 3 | [[llm-wiki-pattern|llm-wiki-pattern]], [[patrick-lewis|patrick-lewis]], [[retrieval-augmented-generation|retrieval-augmented-generation]] |
+| **[[patrick-lewis]]** | entity | 0.7 medium | 2 | [[rag-lewis-2020|rag-lewis-2020]], [[retrieval-augmented-generation|retrieval-augmented-generation]] |

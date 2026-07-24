@@ -158,10 +158,12 @@ def build_table(m: dict) -> str:
     for p in sorted(pages, key=lambda p: (-len(nb[p.id]), p.id)):
         conf = float(p.frontmatter.get("confidence", 0.0) or 0.0)
         band = confidence_band(conf, m)
-        title = str(p.frontmatter.get("title", p.id))
         ptype = TYPE_LABEL.get(p.type, p.type or "page")
-        links = ", ".join(f"`{t}`" for t in sorted(nb[p.id])) or "—"
-        rows.append(f"| **{title}** | {ptype} | {conf} {band} | "
+        # Emit [[wikilinks]]: the mkdocs hook resolves them to real page links,
+        # so every reference in this table is clickable (one resolver, no drift).
+        page_cell = f"[[{p.id}]]"
+        links = ", ".join(f"[[{t}|{t}]]" for t in sorted(nb[p.id])) or "—"
+        rows.append(f"| **{page_cell}** | {ptype} | {conf} {band} | "
                     f"{len(nb[p.id])} | {links} |")
     return "\n".join(rows)
 
