@@ -53,6 +53,10 @@ the `query` verb below.
 2. Steps 1's scaffolding writes one **source page** per file under `wiki/sources/`
    (`origin`, `media_type`, `ingested_with`, `checksum` are filled in for you).
    The pages land as `status: draft` — the steps below turn them into real wiki.
+   Ingest prints a non-blocking `⚠` warning when an incoming source matches an
+   existing page's `checksum` or is highly similar in id/title — a likely re-ingest
+   of the same document. If it's a duplicate, update the existing page rather than
+   keeping the fork; otherwise proceed.
 3. Read the extracted text. Update **entity** and **concept** pages it touches
    (typically 10–15 pages). Add `[[wikilinks]]` both ways.
 4. For every claim you write on an entity/concept page, add the source page's

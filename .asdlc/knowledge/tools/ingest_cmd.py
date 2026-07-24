@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import difflib
 import importlib
 import re
 import shutil
@@ -36,7 +37,11 @@ import urllib.request
 from pathlib import Path
 from urllib.parse import urlparse
 
-from _common import KB_ROOT, load_manifest
+from _common import KB_ROOT, iter_pages, load_manifest
+
+# A new source whose id/title matches an existing one this closely is flagged as
+# a likely re-ingest of the same document under a different name (0.0–1.0).
+_SIMILARITY_WARN = 0.85
 
 ADAPTER_MODULES = {
     "plaintext": ("ingest.adapters.plaintext_adapter", "PlaintextAdapter"),
@@ -111,6 +116,45 @@ def _scaffold_source(src: Path, result, m: dict, origin: str | None = None) -> P
     return out
 
 
+def _existing_sources(m: dict) -> list[tuple[str, str, str]]:
+    """Every existing source page as (id, checksum, title) for dup detection."""
+    out = []
+    for p in iter_pages(m):
+        if p.type != "source":
+            continue
+        fm = p.frontmatter
+        out.append((p.id, str(fm.get("checksum") or ""),
+                    str(fm.get("title") or p.id)))
+    return out
+
+
+def _dup_warnings(sid: str, title: str, checksum: str,
+                  existing: list[tuple[str, str, str]]) -> list[str]:
+    """Advisory warnings if this incoming source looks like an existing one.
+
+    Two independent signals, both non-blocking (the user may genuinely want a
+    second copy): an identical content `checksum` already on file catches the
+    same document re-ingested under a new name; a high id/title similarity
+    catches a lightly-renamed or re-downloaded variant that checksums miss.
+    """
+    warns = []
+    for eid, echecksum, etitle in existing:
+        if eid == sid:
+            continue  # exact-id re-ingest is handled as a hard skip upstream
+        if checksum and checksum == echecksum:
+            warns.append(f"identical content already ingested as '{eid}' "
+                         f"(same checksum) — prefer updating it over forking a copy")
+            continue
+        ratio = max(
+            difflib.SequenceMatcher(None, sid, eid).ratio(),
+            difflib.SequenceMatcher(None, title.lower(), etitle.lower()).ratio(),
+        )
+        if ratio >= _SIMILARITY_WARN:
+            warns.append(f"looks similar to existing source '{eid}' "
+                         f"({ratio:.0%} id/title match) — is this a duplicate?")
+    return warns
+
+
 def _ingest_file(src: Path, m: dict, adapter: str | None,
                  origin: str | None = None) -> tuple[str, str]:
     """Ingest one raw file. Returns (status, message).
@@ -129,6 +173,9 @@ def _ingest_file(src: Path, m: dict, adapter: str | None,
         result = chosen.extract(src)
     except Exception as exc:  # backend missing or conversion failed
         return "error", f"{src.name}: {chosen.name} failed — {exc}"
+    title = (result.meta.get("title") or "").strip() or src.stem
+    for w in _dup_warnings(sid, title, result.checksum, _existing_sources(m)):
+        print(f"  ⚠ {w}")
     page = _scaffold_source(src, result, m, origin=origin)
     rel = page.relative_to(KB_ROOT)
     return "ok", f"{src.name}: ingested via '{chosen.name}' -> {rel} ({len(result.markdown)} chars)"

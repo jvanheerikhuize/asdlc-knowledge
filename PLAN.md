@@ -92,9 +92,8 @@ stdlib+PyYAML, no-infra pattern.
 1. ~~**Backlinks**~~ — superseded by *Wiki-grade* item 5 ("Referenced by"
    backlinks), which computes the same block at build time with no marker
    comments to drift. See Shipped.
-2. **Near-duplicate warning on ingest** — checksums already catch identical
-   files; add a slug/title-similarity warning so re-ingesting the same document
-   under a new name gets flagged instead of silently forking a second source page.
+_(All Next items above are now shipped — see below. The remaining roadmap is the
+Wiki-grade distribution work.)_
 
 ### Wiki-grade distribution (planned)
 
@@ -157,6 +156,15 @@ regenerated from the manifest and the existing link graph, and gated by the same
 
 ### Shipped
 
+- **Near-duplicate warning on ingest.** ✅ Shipped. Checksums only catch a
+  byte-identical file re-ingested under the *same* name (a hard skip). Ingest now
+  also scans existing source pages and prints a non-blocking `⚠` warning when an
+  incoming source shares an existing page's content `checksum` (same document
+  re-ingested under a new name) or scores a high id/title similarity (≥ 0.85, a
+  lightly-renamed or re-downloaded variant checksums miss). Both are advisory —
+  the user may genuinely want a second copy — so ingestion still proceeds; the
+  warning just surfaces the likely duplicate instead of silently forking a second
+  source page. Reuses `iter_pages` + stdlib `difflib`; no new dependency.
 - **URL ingestion — `kb ingest <url>`.** ✅ Shipped. Most new knowledge arrives
   as a link, not a file. `kb ingest <url>` fetches the page once with stdlib
   `urllib` (no new dependency — honours the stdlib+PyYAML constraint), snapshots
