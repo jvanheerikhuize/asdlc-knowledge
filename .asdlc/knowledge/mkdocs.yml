@@ -42,10 +42,21 @@ plugins:
   # canonical page, so an old/alternate name resolves by URL too.
   - redirects:
       redirect_maps:
+        "asai.md": "entities/akari-asai.md"
         "asdlc-kb.md": "entities/asdlc-knowledge-base.md"
+        "edge.md": "entities/darren-edge.md"
+        "facebook-ai-research.md": "entities/meta-ai.md"
+        "facebook-ai-similarity-search.md": "entities/faiss.md"
+        "fair.md": "entities/meta-ai.md"
         "karpathy.md": "entities/andrej-karpathy.md"
+        "karpukhin.md": "entities/vladimir-karpukhin.md"
         "lewis.md": "entities/patrick-lewis.md"
+        "malkov.md": "entities/yury-malkov.md"
+        "mkdocs-material.md": "entities/mkdocs.md"
+        "msr.md": "entities/microsoft-research.md"
+        "reimers.md": "entities/nils-reimers.md"
         "this-repo.md": "entities/asdlc-knowledge-base.md"
+        "yu-a-malkov.md": "entities/yury-malkov.md"
 # Resolve [[wikilinks]] -> real links at build time (tools/mkdocs_hooks.py).
 # Keeps wiki/ source canonical while the published site behaves like a wiki.
 hooks:
@@ -55,13 +66,48 @@ nav:
   - Tags: tags.md
   - Sources:
       - "ASDLC Knowledge Base \u2014 README": sources/asdlc-knowledge-readme.md
+      - "Billion-scale Similarity Search with GPUs": sources/faiss-johnson-2017.md
+      - "Dense Passage Retrieval for Open-Domain Question Answering": sources/dpr-karpukhin-2020.md
+      - "Efficient and Robust ANN Search Using Hierarchical Navigable Small World Graphs": sources/hnsw-malkov-2016.md
+      - "From Local to Global: A Graph RAG Approach to Query-Focused Summarization": sources/graphrag-edge-2024.md
+      - "Introducing the Model Context Protocol": sources/mcp-anthropic-2024.md
       - "Karpathy \u2014 LLM Wiki gist": sources/karpathy-llm-wiki.md
       - "Lewis et al. \u2014 Retrieval-Augmented Generation (2020)": sources/rag-lewis-2020.md
       - "LLM Wiki Setup: Karpathy's Knowledge Base (2026 Guide)": sources/llm-wiki-setup-guide-2026.md
+      - "Self-RAG: Learning to Retrieve, Generate, and Critique through Self-Reflection": sources/self-rag-asai-2023.md
+      - "Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks": sources/sentence-bert-2019.md
   - Entities:
+      - "Akari Asai": entities/akari-asai.md
       - "Andrej Karpathy": entities/andrej-karpathy.md
+      - "Anthropic": entities/anthropic.md
       - "ASDLC Knowledge Base": entities/asdlc-knowledge-base.md
+      - "Darren Edge": entities/darren-edge.md
+      - "Docling": entities/docling.md
+      - "FAISS": entities/faiss.md
+      - "MarkItDown": entities/markitdown.md
+      - "Meta AI (FAIR)": entities/meta-ai.md
+      - "Microsoft Research": entities/microsoft-research.md
+      - "MkDocs": entities/mkdocs.md
+      - "Nils Reimers": entities/nils-reimers.md
+      - "Obsidian": entities/obsidian.md
       - "Patrick Lewis": entities/patrick-lewis.md
+      - "Vladimir Karpukhin": entities/vladimir-karpukhin.md
+      - "Yury Malkov": entities/yury-malkov.md
   - Concepts:
+      - "Agentic Memory": concepts/agentic-memory.md
+      - "Approximate Nearest Neighbor Search": concepts/approximate-nearest-neighbor.md
+      - "Chunking": concepts/chunking.md
+      - "Context Engineering": concepts/context-engineering.md
+      - "Embeddings": concepts/embeddings.md
+      - "GraphRAG": concepts/graph-rag.md
+      - "Hallucination": concepts/hallucination.md
+      - "Hybrid Search": concepts/hybrid-search.md
+      - "Knowledge Graph": concepts/knowledge-graph.md
+      - "Knowledge Management for LLMs": concepts/knowledge-management-for-llms.md
       - "LLM Wiki Pattern": concepts/llm-wiki-pattern.md
+      - "Model Context Protocol (MCP)": concepts/model-context-protocol.md
+      - "Reranking": concepts/reranking.md
       - "Retrieval-Augmented Generation (RAG)": concepts/retrieval-augmented-generation.md
+      - "Semantic Search": concepts/semantic-search.md
+      - "Vector Database": concepts/vector-database.md
+      - "Zettelkasten": concepts/zettelkasten.md

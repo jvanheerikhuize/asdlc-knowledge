@@ -6,7 +6,7 @@ status: verified
 confidence: 0.8
 sources: [karpathy-llm-wiki, llm-wiki-setup-guide-2026]
 created: 2026-07-23
-updated: 2026-07-23
+updated: 2026-07-24
 last_verified: 2026-07-23
 category: knowledge-management
 tags: [pattern, rag-alternative]
@@ -42,3 +42,12 @@ longer hold the whole page graph in context; the mitigation is **directory-level
 indexes**. The same report frames the trade-off against
 [[retrieval-augmented-generation]] as *horizontal* scale (more documents, RAG)
 vs. *vertical* scale (deeper synthesis, the wiki).
+
+## Where it sits
+The LLM wiki is the curated, "vertical" end of
+[[knowledge-management-for-llms]]. Its wiki-links form a lightweight
+[[knowledge-graph]], its linking discipline descends from [[zettelkasten]] (and
+tools like [[obsidian]]), and it is an alternative — or complement — to the
+[[embeddings]]-and-[[vector-database]] retrieval stack that powers
+[[retrieval-augmented-generation]]. The wiki is published for human readers with
+[[mkdocs]].

@@ -6,7 +6,7 @@ status: verified
 confidence: 0.8
 sources: [rag-lewis-2020, llm-wiki-setup-guide-2026]
 created: 2026-07-23
-updated: 2026-07-23
+updated: 2026-07-24
 last_verified: 2026-07-23
 category: knowledge-management
 tags: [rag, retrieval, pattern]
@@ -31,6 +31,17 @@ tags: [rag, retrieval, pattern]
 RAG lets a model cite provenance and update its world knowledge by swapping the
 index, without retraining — the three limitations of parametric-only models that
 [[rag-lewis-2020]] set out to fix.
+
+## The modern RAG stack
+The original paper's dense index has since grown into a whole toolchain, the
+"horizontal" retrieval branch of [[knowledge-management-for-llms]]: documents are
+split by [[chunking]], turned into [[embeddings]], stored in a
+[[vector-database]] indexed with [[approximate-nearest-neighbor]] methods, and
+fetched by [[semantic-search]] — often refined with [[hybrid-search]] and
+[[reranking]], then assembled by [[context-engineering]]. Structured variants such
+as [[graph-rag]] retrieve over a [[knowledge-graph]] instead, and adaptive ones
+like [[self-rag-asai-2023|Self-RAG]] add self-checking to curb
+[[hallucination]].
 
 ## Contrast with the LLM wiki pattern
 RAG and the [[llm-wiki-pattern]] answer the same question — *how does a model use

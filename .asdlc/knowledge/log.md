@@ -7,6 +7,21 @@ description: Append-only, chronological record of KB operations. Newest at top.
 
 Format: `## [YYYY-MM-DD] operation | Title` followed by a short note.
 
+## [2026-07-24] populate | Knowledge-management-for-LLMs domain cluster
+Expanded the KB from 9 to 44 pages with an interlinked, sourced cluster on LLM
+knowledge management. Added 7 source pages ([[graphrag-edge-2024]],
+[[hnsw-malkov-2016]], [[mcp-anthropic-2024]], [[sentence-bert-2019]],
+[[dpr-karpukhin-2020]], [[faiss-johnson-2017]], [[self-rag-asai-2023]]), 15
+concepts under the [[knowledge-management-for-llms]] hub ([[embeddings]],
+[[vector-database]], [[semantic-search]], [[approximate-nearest-neighbor]],
+[[knowledge-graph]], [[graph-rag]], [[chunking]], [[reranking]],
+[[hybrid-search]], [[context-engineering]], [[agentic-memory]],
+[[model-context-protocol]], [[zettelkasten]], [[hallucination]]), and 13
+entities (researchers, orgs, and tools incl. [[faiss]], [[obsidian]],
+[[markitdown]], [[docling]], [[mkdocs]]). Linked the hub into the existing
+[[llm-wiki-pattern]] and [[retrieval-augmented-generation]] pages. `kb lint
+--strict` clean (44 pages, 0 issues); regenerated viz + index.
+
 ## [2026-07-23] ingest | ASDLC Knowledge Base (self-describe)
 Ingested the repo's own README into [[asdlc-knowledge-readme]] and added the
 [[asdlc-knowledge-base]] system entity, linked to [[llm-wiki-pattern]],
