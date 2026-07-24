@@ -26,6 +26,14 @@ plugins:
   # marker in wiki/tags.md is where the plugin injects the grouped listing
   # (the deprecated `tags_file:` option is intentionally omitted).
   - tags
+  # Redirect alias URLs (from pages' `aliases:` frontmatter) to the
+  # canonical page, so an old/alternate name resolves by URL too.
+  - redirects:
+      redirect_maps:
+        "asdlc-kb.md": "entities/asdlc-knowledge-base.md"
+        "karpathy.md": "entities/andrej-karpathy.md"
+        "lewis.md": "entities/patrick-lewis.md"
+        "this-repo.md": "entities/asdlc-knowledge-base.md"
 # Resolve [[wikilinks]] -> real links at build time (tools/mkdocs_hooks.py).
 # Keeps wiki/ source canonical while the published site behaves like a wiki.
 hooks:

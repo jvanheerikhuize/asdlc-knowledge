@@ -86,7 +86,7 @@ stages:
           - task: UsePythonVersion@0
             inputs:
               versionSpec: "$(pythonVersion)"
-          - script: pip install pyyaml mkdocs-material pymdown-extensions
+          - script: pip install pyyaml mkdocs-material pymdown-extensions mkdocs-redirects
             displayName: "Install deps"
           - script: python3 tools/kb.py viz
             workingDirectory: "$(kbDir)"

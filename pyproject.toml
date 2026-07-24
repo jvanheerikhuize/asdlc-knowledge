@@ -16,7 +16,7 @@ lint = ["jsonschema>=4.0"]
 markitdown = ["markitdown>=0.0.1a2"]
 docling = ["docling>=1.0.0"]
 # Static-site visualization layer.
-viz = ["mkdocs-material>=9.5", "pymdown-extensions>=10.0"]
+viz = ["mkdocs-material>=9.5", "pymdown-extensions>=10.0", "mkdocs-redirects>=1.2"]
 # Everything, for a full local workflow.
 all = [
     "jsonschema>=4.0",
@@ -24,6 +24,7 @@ all = [
     "docling>=1.0.0",
     "mkdocs-material>=9.5",
     "pymdown-extensions>=10.0",
+    "mkdocs-redirects>=1.2",
 ]
 
 [tool.setuptools]

@@ -25,7 +25,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: pip install pyyaml mkdocs-material pymdown-extensions
+      - run: pip install pyyaml mkdocs-material pymdown-extensions mkdocs-redirects
       - name: Regenerate viz config + graph
         working-directory: .asdlc/knowledge
         run: python3 tools/kb.py viz
